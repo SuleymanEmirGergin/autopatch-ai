@@ -165,10 +165,23 @@ export class NLPCVEAnalysisService {
 
     const cveAnalyses: CVEAnalysis[] = [];
 
-    // CVE'leri analiz et
-    if (sbomData?.vulnerabilities) {
-      for (const vuln of sbomData.vulnerabilities.slice(0, 10)) {
-        // İlk 10 CVE'yi analiz et
+    // CVE'leri analiz et - tüm package'lerden vulnerabilities topla
+    if (sbomData?.packages) {
+      const allVulnerabilities: Array<{ cveId: string; description: string; summary?: string }> = [];
+      for (const pkg of sbomData.packages) {
+        if (pkg.vulnerabilities) {
+          for (const vuln of pkg.vulnerabilities) {
+            allVulnerabilities.push({
+              cveId: vuln.cveId,
+              description: vuln.description,
+              summary: vuln.description,
+            });
+          }
+        }
+      }
+      
+      // İlk 10 CVE'yi analiz et
+      for (const vuln of allVulnerabilities.slice(0, 10)) {
         try {
           const analysis = await this.analyzeCVE(
             vuln.cveId || "UNKNOWN",

@@ -217,6 +217,7 @@ export class MarkdownService {
     const template = options.template;
     const headerText = template?.headerText || "Executive Risk Summary";
     const companyName = template?.companyName || "AutoPatch AI";
+    const footerText = template?.footerText || "";
 
     const avgRiskScore = images.reduce((sum, img) => sum + img.riskScore, 0) / images.length;
     const criticalImages = images.filter((img) => img.riskLevel === "CRITICAL").length;
@@ -353,7 +354,7 @@ export class MarkdownService {
           .filter((r) => r.status === "FAIL")
           .slice(0, 10)
           .forEach((req) => {
-            md += `- ❌ **${req.requirementId}**: ${this.escapeMarkdown(req.description)}\n`;
+            md += `- ❌ **${req.id}**: ${this.escapeMarkdown(req.description)}\n`;
           });
         md += `\n`;
       }

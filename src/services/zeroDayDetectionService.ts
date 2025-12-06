@@ -151,9 +151,21 @@ export class ZeroDayDetectionService {
     // Indicators topla
     const indicators: ZeroDayIndicator[] = [];
 
-    // Unknown CVE check
-    if (sbomData?.vulnerabilities) {
-      const unknownCVEs = sbomData.vulnerabilities.filter(v => 
+    // Unknown CVE check - tüm package'lerden vulnerabilities topla
+    if (sbomData?.packages) {
+      const allVulnerabilities: Array<{ cveId: string; severity: string }> = [];
+      for (const pkg of sbomData.packages) {
+        if (pkg.vulnerabilities) {
+          for (const vuln of pkg.vulnerabilities) {
+            allVulnerabilities.push({
+              cveId: vuln.cveId,
+              severity: vuln.severity,
+            });
+          }
+        }
+      }
+      
+      const unknownCVEs = allVulnerabilities.filter((v: { cveId: string; severity: string }) => 
         !v.cveId || v.cveId === "UNKNOWN" || v.severity === "UNKNOWN"
       );
 
@@ -163,7 +175,7 @@ export class ZeroDayDetectionService {
           severity: "HIGH",
           description: `${unknownCVEs.length} bilinmeyen CVE tespit edildi`,
           confidence: 0.7,
-          evidence: unknownCVEs.map(v => v.cveId || "UNKNOWN"),
+          evidence: unknownCVEs.map((v: { cveId: string; severity: string }) => v.cveId || "UNKNOWN"),
           recommendedAction: "CVE veritabanını güncelleyin ve image'i yeniden tarayın",
         });
       }

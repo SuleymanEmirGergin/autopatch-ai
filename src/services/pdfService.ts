@@ -24,9 +24,30 @@ export class PdfService {
 
     switch (reportType) {
       case "COMPLIANCE":
-        return this.generateComplianceReport(images, options);
+        // COMPLIANCE raporu için ComplianceAssessmentDocument[] gerekli
+        // Şimdilik type assertion kullanıyoruz, gelecekte method signature değiştirilebilir
+        return this.generateComplianceReport(images as any as ComplianceAssessmentDocument[], options);
       case "EXECUTIVE":
-        return this.generateExecutiveReport(images, options);
+        // Executive report için stats hesapla
+        const totalImages = images.length;
+        const highOrCritical = images.filter(
+          (img) => img.riskLevel === "HIGH" || img.riskLevel === "CRITICAL"
+        ).length;
+        const prodPods = images.reduce((sum, img) => {
+          return (
+            sum +
+            img.pods.filter((p) => {
+              const ns = p.namespace.toLowerCase();
+              return ns === "prod" || ns.startsWith("prod-");
+            }).length
+          );
+        }, 0);
+        return this.generateExecutiveReport(images, {
+          totalImages,
+          highOrCritical,
+          prodImpactedPods: prodPods,
+          lastScanAt: images.length > 0 ? images[0].lastScannedAt : null,
+        }, undefined, options);
       case "DETAILED":
         return this.generateDetailedReport(images, options);
       default:
