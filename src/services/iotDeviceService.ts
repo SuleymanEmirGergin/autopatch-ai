@@ -221,9 +221,9 @@ export class IoTDeviceService {
     deviceTypes: Record<string, number>;
     riskDistribution: Record<string, number>;
   }> {
-    const iotImages = await this.imageRiskRepo.findMany({
-      clusterId: { $regex: /^iot-cluster-/ },
-    });
+    // TODO: findMany method'u repository'ye eklenecek, şimdilik findAll kullanıyoruz
+    const allImages = await this.imageRiskRepo.findAll();
+    const iotImages = allImages.filter(img => img.clusterId?.match(/^iot-cluster-/));
 
     const deviceTypes: Record<string, number> = {};
     const riskDistribution: Record<string, number> = {

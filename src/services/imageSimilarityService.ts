@@ -171,10 +171,14 @@ export class ImageSimilarityService {
       for (let j = 0; j < k; j++) {
         if (clusterImages[j].length > 0) {
           const newCentroid = Array(featureSize).fill(0);
-          clusterImages[j].forEach((img, idx) => {
-            const imgFeatures = features[images.indexOf(img)];
-            for (let d = 0; d < featureSize; d++) {
-              newCentroid[d] += imgFeatures[d];
+          clusterImages[j].forEach((img) => {
+            // Find image index in original images array
+            const imgIndex = images.findIndex(origImg => origImg._id.toString() === img._id.toString());
+            if (imgIndex >= 0) {
+              const imgFeatures = features[imgIndex];
+              for (let d = 0; d < featureSize; d++) {
+                newCentroid[d] += imgFeatures[d];
+              }
             }
           });
           for (let d = 0; d < featureSize; d++) {
