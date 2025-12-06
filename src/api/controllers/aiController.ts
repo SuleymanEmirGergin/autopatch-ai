@@ -431,7 +431,7 @@ export class AIController {
         },
       },
     });
-  }
+  });
 
   /**
    * NLP-based CVE analizi

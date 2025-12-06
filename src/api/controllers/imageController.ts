@@ -387,7 +387,7 @@ export class ImageController {
           format: exportFormat === "XLSX" ? "XLSX" : exportFormat === "CSV" ? "CSV" : "JSON",
           stats: {
             totalImages: filtered.length,
-            highOrCritical,
+            highOrCritical: highCritical,
             prodImpactedPods: prodPods,
             avgRiskScore,
           },

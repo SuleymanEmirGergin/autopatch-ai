@@ -15,6 +15,8 @@ export type AuditAction =
   | "ALERT_RULE_UPDATED"
   | "ALERT_RULE_DELETED"
   | "IMAGE_VIEWED"
+  | "IMAGE_CREATED"
+  | "BULK_IMAGES_CREATED"
   | "EXPORT_GENERATED";
 
 export interface AuditLogDocument extends Document {
@@ -46,6 +48,8 @@ const AuditLogSchema = new Schema<AuditLogDocument>(
         "ALERT_RULE_UPDATED",
         "ALERT_RULE_DELETED",
         "IMAGE_VIEWED",
+        "IMAGE_CREATED",
+        "BULK_IMAGES_CREATED",
         "EXPORT_GENERATED",
       ],
       required: true,

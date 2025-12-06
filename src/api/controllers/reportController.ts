@@ -120,7 +120,7 @@ export class ReportController {
           format: "PDF",
           stats: {
             totalImages: filtered.length,
-            highOrCritical,
+            highOrCritical: highCritical,
             prodImpactedPods: prodPods,
             avgRiskScore,
           },
@@ -169,16 +169,8 @@ export class ReportController {
       });
 
       // Trends al (basit implementasyon)
+      // TODO: getTrends method'u repository'ye eklenecek
       let trendsData: any[] | undefined = undefined;
-      try {
-        // StatsController'dan trends almak için repository kullan
-        const { MongoImageRiskRepository } = await import("../../persistence/imageRisk.repository");
-        const repo = new MongoImageRiskRepository();
-        trendsData = await repo.getTrends(20, clusterId as string | undefined, projectId as string | undefined);
-      } catch (err) {
-        // Trends alınamazsa devam et
-        console.error("Trends alınamadı:", err);
-      }
 
       // Şablonu al
       const template = await this.getTemplate(templateId as string | undefined);
@@ -220,9 +212,9 @@ export class ReportController {
           fileName,
           format: "PDF",
           stats: {
-            totalImages: stats.totalImages,
-            highOrCritical: stats.highOrCritical,
-            prodImpactedPods: stats.prodImpactedPods,
+            totalImages,
+            highOrCritical,
+            prodImpactedPods,
           },
           createdBy: (req as any).user?.apiKey || undefined,
         });
@@ -372,7 +364,7 @@ export class ReportController {
           format: "PDF",
           stats: {
             totalImages: images.length,
-            highOrCritical,
+            highOrCritical: highCritical,
             prodImpactedPods: prodPods,
             avgRiskScore,
           },
@@ -509,7 +501,7 @@ export class ReportController {
           format: "PDF",
           stats: {
             totalImages: filtered.length,
-            highOrCritical,
+            highOrCritical: highCritical,
             prodImpactedPods: prodPods,
             avgRiskScore,
           },
@@ -557,15 +549,9 @@ export class ReportController {
         });
       });
 
-      // Trends al
+      // Trends al (basit implementasyon)
+      // TODO: getTrends method'u repository'ye eklenecek
       let trendsData: any[] | undefined = undefined;
-      try {
-        const { MongoImageRiskRepository } = await import("../../persistence/imageRisk.repository");
-        const repo = new MongoImageRiskRepository();
-        trendsData = await repo.getTrends(20, clusterId as string | undefined, projectId as string | undefined);
-      } catch (err) {
-        console.error("Trends alınamadı:", err);
-      }
 
       // Şablonu al
       const template = await this.getTemplate(templateId as string | undefined);
@@ -755,7 +741,7 @@ export class ReportController {
           format: "PDF",
           stats: {
             totalImages: images.length,
-            highOrCritical,
+            highOrCritical: highCritical,
             prodImpactedPods: prodPods,
             avgRiskScore,
           },
@@ -848,7 +834,7 @@ export class ReportController {
           format: "PDF",
           stats: {
             totalImages: filtered.length,
-            highOrCritical,
+            highOrCritical: highCritical,
             prodImpactedPods: prodPods,
             avgRiskScore,
           },
@@ -896,15 +882,9 @@ export class ReportController {
         });
       });
 
-      // Trends al
+      // Trends al (basit implementasyon)
+      // TODO: getTrends method'u repository'ye eklenecek
       let trendsData: any[] | undefined = undefined;
-      try {
-        const { MongoImageRiskRepository } = await import("../../persistence/imageRisk.repository");
-        const repo = new MongoImageRiskRepository();
-        trendsData = await repo.getTrends(20, clusterId as string | undefined, projectId as string | undefined);
-      } catch (err) {
-        console.error("Trends alınamadı:", err);
-      }
 
       // Şablonu al
       const template = await this.getTemplate(templateId as string | undefined);
@@ -1094,7 +1074,7 @@ export class ReportController {
           format: "PDF",
           stats: {
             totalImages: images.length,
-            highOrCritical,
+            highOrCritical: highCritical,
             prodImpactedPods: prodPods,
             avgRiskScore,
           },
