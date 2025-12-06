@@ -51,252 +51,211 @@ See [AI_FEATURES.md](AI_FEATURES.md) for complete list of 28+ AI features.
 - **Image Detay Sayfası**: Tek bir image için detaylı bilgi, pod listesi, risk faktörleri, scan geçmişi.
 - **CSV/JSON Export**: Filtrelenmiş listeyi CSV veya JSON olarak indirme.
 
-## Kurulum
+## 🚀 Quick Start
 
-### ⚡ Hızlı Başlangıç (Hackathon Demo İçin)
+### Prerequisites
 
-#### 🎬 Demo'yu Çalıştırma (3 Adım)
+- Node.js 18+
+- MongoDB 7+ (veya Docker)
+- npm veya yarn
 
-**1. Demo Verisini Oluştur:**
+### Installation
+
 ```bash
-# Otomatik script (önerilen)
+# 1. Repository'yi klonlayın
+git clone https://github.com/SuleymanEmirGergin/autopatch-ai.git
+cd autopatch-ai
+
+# 2. Dependencies'leri yükleyin
+npm install
+cd frontend && npm install && cd ..
+
+# 3. Environment variables'ı ayarlayın
+cp .env.example .env
+# .env dosyasını düzenleyin
+
+# 4. MongoDB'yi başlatın (Docker ile)
+docker compose up -d mongo
+
+# 5. Demo verisini oluşturun (opsiyonel)
+npm run generate-demo-data
+
+# 6. Backend'i başlatın (Terminal 1)
+npm run dev
+
+# 7. Frontend'i başlatın (Terminal 2)
+cd frontend && npm run dev
+```
+
+**Tarayıcıda açın:** http://localhost:3000
+
+### 🎬 Demo Modu (Hackathon İçin)
+
+Hızlı demo için:
+
+```bash
+# Otomatik demo script'i
 ./QUICK_START_DEMO.sh
 
 # Veya manuel
 npm install mongodb dotenv
 npm run generate-demo-data
+npm run dev  # Backend
+cd frontend && npm run dev  # Frontend (yeni terminal)
 ```
 
-**2. Backend'i Başlat (Yeni Terminal):**
-```bash
-npm run dev
-```
+📖 **Detaylı Demo Rehberi:** [Demo Guide](docs/guides/DEMO_GUIDE.md)
 
-**3. Frontend'i Başlat (Başka Bir Terminal):**
-```bash
-cd frontend
-npm run dev
-```
+### 🐳 Docker ile Kurulum
 
-**4. Tarayıcıda Aç:**
-```
-http://localhost:3000
-```
-
-**📖 Detaylı Rehber:** [Demo Guide](docs/guides/DEMO_GUIDE.md)
-
-#### Otomatik Kurulum (İlk Kurulum İçin)
-
-En hızlı kurulum için otomatik script kullanın:
-
-```bash
-./quick-start.sh
-```
-
-Script otomatik olarak:
-- `.env` dosyası oluşturur (yoksa)
-- MongoDB ve Nginx container'larını başlatır
-- Dependencies'leri yükler
-
-Sonra manuel olarak:
-```bash
-# Terminal 1: Backend
-npm run dev
-
-# Terminal 2: Frontend
-cd frontend && npm run dev
-```
-
-**Demo için detaylı rehber**: `DEMO_GUIDE.md` dosyasına bakın.
-
-### Hızlı Başlangıç (Tek Port - Önerilen)
-
-Tüm servisleri tek bir localhost portu (3000) üzerinden çalıştırmak için:
-
-1. MongoDB ve Nginx'i başlatın:
-```bash
-docker compose up -d mongo nginx
-```
-
-2. Backend'i başlatın (port 5000):
-```bash
-npm install
-PORT=5000 npm run dev
-```
-
-3. Frontend'i başlatın (port 3002):
-```bash
-cd frontend
-npm install
-PORT=3002 npm run dev
-```
-
-4. Tarayıcıda açın: **http://localhost:3000**
-
-**Not:** Nginx reverse proxy tüm trafiği yönlendirir:
-- `http://localhost:3000` → Frontend
-- `http://localhost:3000/api` → Backend API
-- `http://localhost:3000/docs` → Swagger Docs
-- `http://localhost:3000/socket.io` → WebSocket
-
-### Geliştirme Modu (Ayrı Portlar)
-
-Eğer nginx kullanmak istemiyorsanız:
-
-1. `.env` dosyası oluştur:
-
-```bash
-cp .env.example .env
-# .env dosyasını düzenleyin ve gerekli değerleri girin
-```
-
-2. MongoDB yoksa Docker ile başlat:
-
-```bash
-docker compose up -d mongo
-```
-
-3. Backend'i dev modda çalıştır:
-
-```bash
-PORT=5000 npm run dev
-```
-
-4. Frontend'i başlat:
-
-```bash
-cd frontend
-npm install
-PORT=3002 npm run dev
-```
-
-5. Erişim:
-- Frontend: http://localhost:3002
-- Backend: http://localhost:5000
-
-Frontend için `.env.local` oluşturun (opsiyonel):
-
-```bash
-cd frontend
-cat > .env.local << 'EOF'
-NEXT_PUBLIC_BACKEND_URL=/api
-BACKEND_ADMIN_API_KEY=your-admin-api-key
-NEXT_PUBLIC_READONLY=false
-EOF
-```
-
-### Production Modu (Docker Compose ile)
+Tüm servisleri Docker ile çalıştırmak için:
 
 ```bash
 docker compose up --build
 ```
 
-Bu komut hem MongoDB'yi hem de Scanner Service’i MOCK modda ayağa kaldırır.
+Bu komut MongoDB, Backend ve Frontend'i birlikte başlatır.
 
-### Testler
+### ⚙️ Geliştirme Modu
 
-```bash
-npm test
-```
-
-### REST API Uç Noktaları
-
-#### Temel Endpoint'ler
-- **GET `/health`** – Health check  
-- **POST `/scan`** – Taramayı tetikler  
-- **GET `/images`** – Tüm imajları risk skorları ile listeler  
-- **GET `/images/:imageName`** – Tek bir imaj için detay  
-- **GET `/images/:imageName/history?limit=10`** – Bir imajın scan geçmişi  
-- **GET `/images/top?limit=5&prodOnly=false`** – En riskli N imaj  
-- **GET `/docs`** – Swagger UI
-
-#### Allowlist Yönetimi
-- **GET `/allowlist`** – Tüm allowlist kayıtlarını listele  
-- **POST `/allowlist`** – Yeni allowlist kaydı ekle/güncelle  
-- **DELETE `/allowlist/:imageName`** – Allowlist kaydını sil
-
-### Frontend Kurulumu
+Ayrı portlarda çalıştırmak için:
 
 ```bash
+# 1. MongoDB'yi başlat
+docker compose up -d mongo
+
+# 2. Backend (port 5000)
+PORT=5000 npm run dev
+
+# 3. Frontend (port 3002 - yeni terminal)
 cd frontend
-npm install
-npm run dev
+PORT=3002 npm run dev
 ```
 
-Frontend varsayılan olarak `http://localhost:3001` (veya bir sonraki boş port) üzerinde çalışır.
+Erişim:
+- Frontend: http://localhost:3002
+- Backend: http://localhost:5000
+- API Docs: http://localhost:5000/docs
 
-### Huawei Cloud CCE Entegrasyonu
+## 🧪 Testing
 
-Proje, Huawei Cloud CCE (Container Engine) ile entegre çalışabilir. Gerçek Huawei Cloud bağlantısı için:
+```bash
+# Tüm testleri çalıştır
+npm test
 
-1. **Environment Variables Ayarlayın**:
-   - `MOCK_CCE=false` olarak ayarlayın
-   - `CCE_ENDPOINT`: Huawei Cloud CCE endpoint URL'i (örn: `https://cce.cn-north-1.myhuaweicloud.com`)
-   - `CCE_PROJECT_ID`: Huawei Cloud proje ID'si
-   - `CCE_CLUSTER_ID`: CCE cluster ID'si
+# Coverage ile
+npm run test:coverage
 
-2. **Authentication Yöntemi Seçin**:
+# Watch mode
+npm run test:watch
+```
 
-   **Yöntem 1: Token-based (Önerilen)**
-   ```bash
-   CCE_TOKEN=your-huawei-cloud-token
-   ```
+## 📡 API Documentation
 
-   **Yöntem 2: AK/SK (Access Key / Secret Key)**
-   ```bash
-   HUAWEI_ACCESS_KEY=your-access-key
-   HUAWEI_SECRET_KEY=your-secret-key
-   HUAWEI_REGION=cn-north-1  # veya kullandığınız region
-   ```
+### REST API Endpoints
 
-3. **Bağlantıyı Test Edin**:
-   Backend başlatıldığında, `RealCCEScanner` otomatik olarak Huawei Cloud CCE'ye bağlanmayı dener. Hata durumunda log'larda detaylı bilgi bulunur.
+#### Core Endpoints
+- `GET /health` - Health check
+- `POST /scan` - Trigger scan
+- `GET /images` - List all images with risk scores
+- `GET /images/:imageName` - Get image details
+- `GET /images/:imageName/history` - Get scan history
+- `GET /images/top` - Get top N risky images
+- `GET /docs` - Swagger UI documentation
 
-**Not**: Huawei Cloud CCE Kubernetes API'sine erişim için gerekli izinlerin (RBAC) yapılandırıldığından emin olun.
+#### Allowlist Management
+- `GET /allowlist` - List all allowlist entries
+- `POST /allowlist` - Add/update allowlist entry
+- `DELETE /allowlist/:imageName` - Delete allowlist entry
 
-### Proje Yapısı
+**📖 Full API Documentation:** Visit `http://localhost:5000/docs` for interactive Swagger UI
+
+## ☁️ Huawei Cloud CCE Integration
+
+Proje Huawei Cloud CCE (Container Engine) ile entegre çalışabilir.
+
+### Configuration
+
+1. **Environment Variables** ayarlayın:
+
+```bash
+MOCK_CCE=false
+CCE_ENDPOINT=https://cce.cn-north-1.myhuaweicloud.com
+CCE_PROJECT_ID=your-project-id
+CCE_CLUSTER_ID=your-cluster-id
+```
+
+2. **Authentication** yöntemi seçin:
+
+**Option 1: Token-based (Recommended)**
+```bash
+CCE_TOKEN=your-huawei-cloud-token
+```
+
+**Option 2: AK/SK (Access Key / Secret Key)**
+```bash
+HUAWEI_ACCESS_KEY=your-access-key
+HUAWEI_SECRET_KEY=your-secret-key
+HUAWEI_REGION=cn-north-1
+```
+
+3. **Test Connection**: Backend başlatıldığında otomatik olarak bağlanmayı dener.
+
+📖 **Detaylı Rehber:** [Huawei Cloud Integration Guide](HUAWEI_CLOUD_INTEGRATION_GUIDE.md)
+
+**Note:** RBAC permissions'ların yapılandırıldığından emin olun.
+
+## 📁 Project Structure
 
 ```
-Huawei/
-├── src/                    # Backend kaynak kodları
+autopatch-ai/
+├── src/                    # Backend source code
 │   ├── api/               # Express routes & controllers
-│   ├── config/             # Konfigürasyon yönetimi
-│   ├── persistence/        # MongoDB modelleri & repository'ler
-│   ├── risk/               # Risk skorlama motoru
-│   ├── scanner/            # CCE scanner implementasyonları
-│   ├── services/           # Business logic servisleri
-│   └── types/              # TypeScript tip tanımları
-├── frontend/               # Next.js frontend uygulaması
-│   ├── pages/              # Next.js sayfaları
-│   ├── lib/                # API client fonksiyonları
-│   └── styles/             # Global CSS stilleri
-├── tests/                  # Jest test dosyaları
-├── docker-compose.yml      # Docker Compose konfigürasyonu
-├── Dockerfile              # Backend Docker image tanımı
-├── README.md               # Bu dosya
-├── DEMO_GUIDE.md           # Hackathon demo rehberi
-├── PROJECT_SUMMARY.md      # Proje özeti
-└── quick-start.sh          # Hızlı kurulum script'i
+│   ├── config/            # Configuration management
+│   ├── persistence/       # MongoDB models & repositories
+│   ├── risk/              # Risk scoring engine
+│   ├── scanner/           # CCE scanner implementations
+│   ├── services/          # Business logic services
+│   └── types/             # TypeScript type definitions
+├── frontend/              # Next.js frontend application
+│   ├── pages/             # Next.js pages
+│   ├── lib/               # API client functions
+│   └── styles/            # Global CSS styles
+├── tests/                 # Jest test files
+├── docs/                  # Documentation
+│   ├── guides/            # User guides
+│   ├── hackathon-evaluation/  # Hackathon docs
+│   └── video/             # Video scripts
+├── .github/                # GitHub workflows & templates
+├── docker-compose.yml      # Docker Compose configuration
+├── Dockerfile              # Backend Docker image
+└── README.md               # This file
 ```
 
-## 📚 Ek Dokümantasyon
+## 📚 Documentation
 
-- **DEMO_GUIDE.md**: Hackathon demo rehberi ve senaryoları
-- **PROJECT_SUMMARY.md**: Proje özeti ve jüri için bilgiler
-- **USAGE_GUIDE.md**: Detaylı kullanım kılavuzu
-- **CHANGELOG.md**: Değişiklik geçmişi
+- [AI Features](AI_FEATURES.md) - Complete list of 28+ AI features
+- [Demo Guide](docs/guides/DEMO_GUIDE.md) - Hackathon demo scenarios
+- [Usage Guide](docs/guides/USAGE_GUIDE.md) - Detailed usage guide
+- [Huawei Cloud Integration](HUAWEI_CLOUD_INTEGRATION_GUIDE.md) - Cloud setup guide
+- [Security Improvements](SECURITY_IMPROVEMENTS.md) - Security features
+- [Contributing](CONTRIBUTING.md) - Contribution guidelines
 
-## 🎯 Hackathon İçin Önemli Notlar
+## 🎯 Hackathon Notes
 
-1. **Mock Modu**: `MOCK_CCE=true` ile gerçek Huawei Cloud bağlantısı olmadan demo yapabilirsiniz
-2. **Hızlı Kurulum**: `./quick-start.sh` script'i ile 5 dakikada hazır
-3. **Demo Senaryoları**: `DEMO_GUIDE.md` dosyasında detaylı senaryolar var
-4. **API Dokümantasyonu**: `http://localhost:3000/docs` adresinde Swagger UI
+- **Mock Mode**: Set `MOCK_CCE=true` to run without real Huawei Cloud connection
+- **Quick Setup**: Use `./QUICK_START_DEMO.sh` for fast demo setup
+- **API Docs**: Available at `http://localhost:5000/docs` (Swagger UI)
+- **Demo Scenarios**: See [Demo Guide](docs/guides/DEMO_GUIDE.md)
 
-## 📞 Destek
+## 📞 Support
 
-- Health Check: `http://localhost:3000/health`
-- API Docs: `http://localhost:3000/docs`
-- Demo Rehberi: `DEMO_GUIDE.md`
+- **Health Check**: `http://localhost:5000/health`
+- **API Documentation**: `http://localhost:5000/docs`
+- **Issues**: [GitHub Issues](https://github.com/SuleymanEmirGergin/autopatch-ai/issues)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 
