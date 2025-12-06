@@ -66,7 +66,7 @@ export class RealCCEScanner implements CCEScanner {
       try {
         this.axiosInstance = this.authService.getAxiosInstance();
       } catch (error) {
-        logger.error("Huawei Cloud authentication yapılandırılamadı", { error });
+        logger.error("Huawei Cloud authentication yapılandırılamadı", error as Error);
       }
     }
   }
@@ -143,12 +143,7 @@ export class RealCCEScanner implements CCEScanner {
 
       return podSummaries;
     } catch (error: any) {
-      logger.error("Huawei Cloud CCE pod çekme hatası", {
-        error: error.message,
-        stack: error.stack,
-        endpoint: this.options.endpoint,
-        clusterId: this.options.clusterId,
-      });
+      logger.error("Huawei Cloud CCE pod çekme hatası", error as Error);
 
       // Daha anlaşılır hata mesajları
       if (error.code === "ECONNREFUSED" || error.code === "ETIMEDOUT") {
@@ -196,10 +191,7 @@ export class RealCCEScanner implements CCEScanner {
         })),
       }));
     } catch (error: any) {
-      logger.error("Namespace pod çekme hatası", {
-        namespace,
-        error: error.message,
-      });
+      logger.error(`Namespace pod çekme hatası: ${namespace}`, error as Error);
       throw error;
     }
   }

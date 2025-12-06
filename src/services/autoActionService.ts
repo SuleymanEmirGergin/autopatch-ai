@@ -130,7 +130,7 @@ export class AutoActionService {
     }
 
     return {
-      policyId: policy.id,
+      policyId: policy._id.toString(),
       policyName: policy.name,
       totalMatches: images.length,
       executedCount: items.filter((i) => i.status === "EXECUTED" || i.status === "NOTIFIED").length,

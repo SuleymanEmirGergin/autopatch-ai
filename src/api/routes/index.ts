@@ -9,7 +9,6 @@ import { CustomRuleController } from "../controllers/customRuleController";
 import { AuditController } from "../controllers/auditController";
 import { DependencyController } from "../controllers/dependencyController";
 import { ComplianceController } from "../controllers/complianceController";
-import { RemediationController } from "../controllers/remediationController";
 import { ScorecardController } from "../controllers/scorecardController";
 import { StatsController } from "../controllers/statsController";
 import { ApiTokenController } from "../controllers/apiTokenController";
@@ -23,7 +22,6 @@ import { NotificationController } from "../controllers/notificationController";
 import { WebhookController } from "../controllers/webhookController";
 import { WidgetController } from "../controllers/widgetController";
 import { ImageComparisonController } from "../controllers/imageComparisonController";
-import { ComplianceController } from "../controllers/complianceController";
 import { ReportController } from "../controllers/reportController";
 import { ScheduledReportController } from "../controllers/scheduledReportController";
 import { ReportTemplateController } from "../controllers/reportTemplateController";
@@ -98,7 +96,6 @@ export function createRouter(wsService?: WebSocketService): Router {
   const auditController = new AuditController();
   const dependencyController = new DependencyController();
   const complianceController = new ComplianceController();
-  const remediationController = new RemediationController();
   const scorecardController = new ScorecardController();
   const apiTokenController = new ApiTokenController();
   const jiraController = new JiraController();
@@ -111,7 +108,6 @@ export function createRouter(wsService?: WebSocketService): Router {
   const webhookController = new WebhookController();
   const widgetController = new WidgetController();
   const imageComparisonController = new ImageComparisonController();
-  const complianceController = new ComplianceController();
   const statsController = new StatsController();
   const autoActionController = new AutoActionController();
   
@@ -176,10 +172,10 @@ export function createRouter(wsService?: WebSocketService): Router {
 
   // Image recommendations
   router.get("/images/:imageName/recommendations", apiKeyAuth, recommendationController.getImageRecommendations);
-  router.get("/images/:imageName/update-recommendations", apiKeyAuth, recommendationController.getImageUpdateRecommendations);
+  router.get("/images/:imageName/patch-recommendations", apiKeyAuth, recommendationController.getImagePatchRecommendations);
   router.get("/recommendations", apiKeyAuth, recommendationController.getBulkRecommendations);
   router.get("/recommendations/priority", apiKeyAuth, recommendationController.getPriorityRecommendations);
-  router.get("/recommendations/updates", apiKeyAuth, recommendationController.getBulkUpdateRecommendations);
+  router.get("/recommendations/patches", apiKeyAuth, recommendationController.getBulkPatchRecommendations);
   router.get("/images/:imageName/patch-recommendations", apiKeyAuth, recommendationController.getImagePatchRecommendations);
   router.get("/recommendations/patches", apiKeyAuth, recommendationController.getBulkPatchRecommendations);
   
@@ -301,13 +297,13 @@ export function createRouter(wsService?: WebSocketService): Router {
   router.get("/dependency-graph", dependencyController.getGraph);
   router.get("/dependency-graph/image/:imageName", dependencyController.getImageDependencies);
 
-  // Compliance reporting
-  router.get("/compliance/:standard", complianceController.getReport);
-  router.get("/compliance", complianceController.getAllReports);
+  // Compliance reporting - TODO: Method'lar eklenecek
+  // router.get("/compliance/:standard", complianceController.getReport);
+  // router.get("/compliance", complianceController.getAllReports);
 
-  // Remediation recommendations
-  router.get("/remediation/image/:imageName", remediationController.getImageRecommendations);
-  router.get("/remediation/general", remediationController.getGeneralRecommendations);
+  // Remediation recommendations - TODO: Method'lar eklenecek
+  // router.get("/remediation/image/:imageName", remediationController.getImageRecommendations);
+  // router.get("/remediation/general", remediationController.getGeneralRecommendations);
 
   // Security scorecard
   router.get("/scorecard/:imageName", scorecardController.getImageScorecard);

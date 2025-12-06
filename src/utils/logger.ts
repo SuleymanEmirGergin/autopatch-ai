@@ -82,8 +82,9 @@ class Logger {
     this.log(LogLevel.WARN, message, context);
   }
 
-  error(message: string, error?: Error, context?: Record<string, any>) {
-    this.log(LogLevel.ERROR, message, context, error);
+  error(message: string, error?: Error | unknown, context?: Record<string, any>) {
+    const errorObj = error instanceof Error ? error : (error ? new Error(String(error)) : undefined);
+    this.log(LogLevel.ERROR, message, context, errorObj);
   }
 }
 

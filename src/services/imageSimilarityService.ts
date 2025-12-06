@@ -140,10 +140,11 @@ export class ImageSimilarityService {
     // Iterate until convergence
     let iterations = 0;
     let changed = true;
+    let assignments: number[] = new Array(images.length).fill(-1);
 
     while (changed && iterations < 50) {
       changed = false;
-      const assignments: number[] = new Array(images.length).fill(-1);
+      assignments = new Array(images.length).fill(-1);
       const clusterImages: ImageRiskDocument[][] = Array(k).fill(null).map(() => []);
 
       // Assign each image to nearest centroid

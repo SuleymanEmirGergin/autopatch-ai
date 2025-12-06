@@ -300,8 +300,8 @@ export class IntelligentWorkloadOptimizationService {
       .map(opt => ({
         imageName: opt.imageName,
         savings: opt.estimatedSavings.monthly,
-        priority: opt.estimatedSavings.monthly > 100 ? "HIGH" :
-          opt.estimatedSavings.monthly > 50 ? "MEDIUM" : "LOW",
+        priority: (opt.estimatedSavings.monthly > 100 ? "HIGH" :
+          opt.estimatedSavings.monthly > 50 ? "MEDIUM" : "LOW") as "HIGH" | "MEDIUM" | "LOW",
       }))
       .sort((a, b) => b.savings - a.savings)
       .slice(0, 10);

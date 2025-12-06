@@ -798,7 +798,7 @@ export class AIController {
     try {
       const decision = await this.autoRemediationService.makeDecision(
         image,
-        scripts as RemediationScript[]
+        scripts as any as import("../../services/remediationScriptService").RemediationScript[]
       );
 
       res.json({

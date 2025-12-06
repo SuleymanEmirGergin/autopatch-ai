@@ -166,7 +166,11 @@ export class AutoRemediationDecisionService {
 
     for (const script of availableScripts) {
       try {
-        const prediction = await this.successPredictionService.predictSuccess(image, script);
+        const prediction = await this.successPredictionService.predictSuccess(image, {
+          type: script.scriptType.toUpperCase() as "BASH" | "KUBECTL" | "GITHUB_ACTIONS" | "GITLAB_CI",
+          riskFactor: script.riskFactor,
+          script: script.script,
+        });
         scriptEvaluations.push({ script, prediction });
       } catch (error) {
         logger.error(`Script evaluation hatası:`, error);
@@ -441,7 +445,7 @@ export class AutoRemediationDecisionService {
     // Basit tahmin (gerçek kullanımda daha detaylı)
     let downtime = 5; // Base minutes
 
-    if (script.type === "BASH" || script.type === "KUBECTL") {
+    if (script.scriptType === "bash" || script.scriptType === "kubectl") {
       downtime += 2;
     }
 
@@ -465,11 +469,11 @@ export class AutoRemediationDecisionService {
    * Rollback plan oluşturur
    */
   private generateRollbackPlan(script: RemediationScript): string {
-    if (script.type === "KUBECTL") {
+    if (script.scriptType === "kubectl") {
       return `kubectl rollout undo deployment <deployment-name> -n <namespace>`;
     }
 
-    if (script.type === "BASH") {
+    if (script.scriptType === "bash") {
       return "Önceki image tag'ine geri dön: kubectl set image deployment/<name> <container>=<previous-image>";
     }
 

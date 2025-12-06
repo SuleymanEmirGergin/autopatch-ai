@@ -17,7 +17,11 @@ export class HtmlService {
       case "COMPLIANCE":
         return this.generateComplianceReport(images as any, options);
       case "EXECUTIVE":
-        return this.generateExecutiveReport(images, options);
+        // Stats hesapla
+        const totalImages = images.length;
+        const highOrCritical = images.filter((img) => img.riskLevel === "HIGH" || img.riskLevel === "CRITICAL").length;
+        const prodPods = images.reduce((sum, img) => sum + img.pods.filter((p) => p.namespace.toLowerCase().startsWith("prod")).length, 0);
+        return this.generateExecutiveReport(images, { totalImages, highOrCritical, prodImpactedPods: prodPods, lastScanAt: null }, undefined, options);
       case "DETAILED":
         return this.generateDetailedReport(images, options);
       default:

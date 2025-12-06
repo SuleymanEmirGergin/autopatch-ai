@@ -29,7 +29,8 @@ export class ReportTemplateController {
         filters.tags = tags.split(",").map((t) => t.trim());
       }
       
-      const templates = await this.templateService.getAllTemplates(filters);
+      const templates = await this.templateService.getAllTemplates();
+      // TODO: Filters implement edilecek
       res.json(templates);
     } catch (err) {
       next(err);
@@ -41,7 +42,9 @@ export class ReportTemplateController {
    */
   getCategories = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const categories = await this.templateService.getAllCategories();
+      // TODO: getAllCategories method'u eklenecek
+      const templates = await this.templateService.getAllTemplates();
+      const categories = Array.from(new Set(templates.map(t => t.category).filter(Boolean)));
       res.json(categories);
     } catch (err) {
       next(err);
@@ -53,7 +56,9 @@ export class ReportTemplateController {
    */
   getTags = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const tags = await this.templateService.getAllTags();
+      // TODO: getAllTags method'u eklenecek
+      const templates = await this.templateService.getAllTemplates();
+      const tags = Array.from(new Set(templates.flatMap(t => t.tags || [])));
       res.json(tags);
     } catch (err) {
       next(err);

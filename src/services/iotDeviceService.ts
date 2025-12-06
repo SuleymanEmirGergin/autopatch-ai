@@ -4,7 +4,7 @@
  */
 
 import { ImageRiskResult } from "../risk/riskEngine";
-import { ImageRiskRepository } from "../persistence/imageRisk.repository";
+import { ImageRiskRepository, MongoImageRiskRepository } from "../persistence/imageRisk.repository";
 import { RiskEngine } from "../risk/riskEngine";
 import { logger } from "../utils/logger";
 
@@ -44,7 +44,7 @@ export class IoTDeviceService {
   private riskEngine: RiskEngine;
 
   constructor() {
-    this.imageRiskRepo = new ImageRiskRepository();
+    this.imageRiskRepo = new MongoImageRiskRepository();
     this.riskEngine = new RiskEngine();
   }
 
@@ -209,7 +209,7 @@ export class IoTDeviceService {
       query.clusterId = { $regex: `iot-cluster-${deviceType}` };
     }
 
-    return await this.imageRiskRepo.findMany(query);
+    return await this.imageRiskRepo.findAll(query.clusterId as string, query.projectId as string);
   }
 
   /**

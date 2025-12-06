@@ -190,7 +190,12 @@ export class ComplianceService {
     projectId?: string
   ): Promise<ComplianceCheckResult[]> {
     const images = await this.imageRiskRepo.findAll(clusterId, projectId);
-    const stats = await this.imageRiskRepo.getStats(clusterId, projectId);
+    // Stats hesapla
+    const stats = {
+      totalImages: images.length,
+      highOrCritical: images.filter((img) => img.riskLevel === "HIGH" || img.riskLevel === "CRITICAL").length,
+      lastScanAt: images.length > 0 ? images[0].lastScannedAt : null,
+    };
 
     const results: ComplianceCheckResult[] = [];
 

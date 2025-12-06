@@ -95,14 +95,18 @@ echo "Starting remediation for ${request.imageName}..."
 `;
 
       if (request.riskFactors.includes("Uses latest tag")) {
+        const imageNameBase = request.imageName.split(":")[0];
+        const version = "v1.0.0";  // Update this to your desired version
+        const newImage = `${imageNameBase}:${version}`;
+        
         script += `# Fix: Use versioned tag instead of latest
-IMAGE_NAME="${request.imageName.split(":")[0]}"
-VERSION="v1.0.0"  # Update this to your desired version
-NEW_IMAGE="${IMAGE_NAME}:${VERSION}"
+IMAGE_NAME="${imageNameBase}"
+VERSION="${version}"  # Update this to your desired version
+NEW_IMAGE="${newImage}"
 
 echo "Updating image tag from latest to versioned..."
-docker pull ${NEW_IMAGE}
-docker tag ${NEW_IMAGE} ${request.imageName}
+docker pull ${newImage}
+docker tag ${newImage} ${request.imageName}
 
 `;
       }
