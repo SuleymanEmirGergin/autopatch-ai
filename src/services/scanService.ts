@@ -17,6 +17,7 @@ import { CustomRiskRuleRepository } from "../persistence/customRiskRule.reposito
 import { AuditService } from "./auditService";
 import { AnomalyDetectionService } from "./anomalyDetectionService";
 import { WebhookEventService } from "./webhookEventService";
+import { ImageRiskDocument } from "../persistence/imageRisk.model";
 
 export class ScanService {
   private readonly customRuleRepo = new CustomRiskRuleRepository();

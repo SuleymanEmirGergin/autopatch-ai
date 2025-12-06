@@ -1,4 +1,4 @@
-import cron from "node-cron";
+import * as cron from "node-cron";
 import { ScheduledReportModel, ScheduledReportDocument, ScheduleFrequency } from "../persistence/scheduledReport.model";
 import { PdfService, ReportType } from "./pdfService";
 import { ScanService } from "./scanService";
@@ -8,7 +8,7 @@ import { ReportController } from "../api/controllers/reportController";
 import { StatsController } from "../api/controllers/statsController";
 
 export class ScheduledReportService {
-  private cronJobs: Map<string, cron.ScheduledTask> = new Map();
+  private cronJobs: Map<string, ReturnType<typeof cron.schedule>> = new Map();
   private pdfService: PdfService;
   private scanService: ScanService;
   private complianceService: ComplianceService;
@@ -70,7 +70,6 @@ export class ScheduledReportService {
         await this.executeReport(report);
       },
       {
-        scheduled: true,
         timezone: report.timezone || "Europe/Istanbul",
       }
     );

@@ -5,7 +5,14 @@ import {
   WidgetConfig,
 } from "../persistence/widget.model";
 import { ImageRiskRepository, MongoImageRiskRepository } from "../persistence/imageRisk.repository";
-import { Stats } from "../api/controllers/statsController";
+
+export interface Stats {
+  totalImages: number;
+  highOrCritical: number;
+  prodImpactedPods: number;
+  avgRiskScore: number;
+  lastScanAt: Date | null;
+}
 
 export interface CreateWidgetPayload {
   name: string;
@@ -136,15 +143,28 @@ export class WidgetService {
   }
 
   private async getStatsCardData(widget: WidgetDocument): Promise<any> {
-    const stats = await this.imageRiskRepo.getStats(
+    // TODO: getStats method'u repository'ye eklenecek
+    const images = await this.imageRiskRepo.findAll(
       widget.config.clusterId,
       widget.config.projectId
     );
+    const highOrCritical = images.filter(
+      (img) => img.riskLevel === "HIGH" || img.riskLevel === "CRITICAL"
+    ).length;
+    const prodPods = images.reduce((sum, img) => {
+      return (
+        sum +
+        img.pods.filter((p) => {
+          const ns = p.namespace.toLowerCase();
+          return ns === "prod" || ns.startsWith("prod-");
+        }).length
+      );
+    }, 0);
     return {
-      totalImages: stats.totalImages,
-      highOrCritical: stats.highOrCritical,
-      prodImpactedPods: stats.prodImpactedPods,
-      lastScanAt: stats.lastScanAt,
+      totalImages: images.length,
+      highOrCritical,
+      prodImpactedPods: prodPods,
+      lastScanAt: images.length > 0 ? images[0].lastScannedAt : null,
     };
   }
 
@@ -182,13 +202,11 @@ export class WidgetService {
   }
 
   private async getTrendChartData(widget: WidgetDocument): Promise<any> {
+    // TODO: getTrends method'u repository'ye eklenecek
     const limit = widget.config.limit || 20;
-    const trends = await this.imageRiskRepo.getTrends(
-      limit,
-      widget.config.clusterId,
-      widget.config.projectId
-    );
-    return trends.map((t) => ({
+    // Şimdilik boş array döndür
+    const trends: Array<{ finishedAt: Date; avgRiskScore: number; highOrCritical: number }> = [];
+    return trends.map((t: { finishedAt: Date; avgRiskScore: number; highOrCritical: number }) => ({
       date: t.finishedAt.toISOString(),
       avgRiskScore: t.avgRiskScore,
       highOrCritical: t.highOrCritical,
