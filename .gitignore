@@ -1,0 +1,101 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+package-lock.json
+frontend/package-lock.json
+
+# Build outputs
+dist/
+frontend/.next/
+frontend/out/
+frontend/build/
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+frontend/.env.local
+frontend/.env*.local
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+.jest/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.save
+dosya.json.save
+
+# Uploads
+uploads/
+frontend/public/uploads/
+frontend/public/logos/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker
+.dockerignore
+
+# MongoDB data
+data/
+mongodb-data/
+
+# Secrets and credentials
+*.pem
+*.key
+*.cert
+secrets/
+credentials/
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# MacOS
+.AppleDouble
+.LSOverride
+
+# Windows
+$RECYCLE.BIN/
+*.lnk
+
