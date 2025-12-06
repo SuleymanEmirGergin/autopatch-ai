@@ -71,7 +71,7 @@ describe("AI Performance Tests", () => {
     };
 
     const startTime = Date.now();
-    await anomalyService.detectAnomaly(mockImage as any, "test-cluster");
+    await anomalyService.detectAIAnomaly(mockImage as any);
     const endTime = Date.now();
 
     const duration = endTime - startTime;

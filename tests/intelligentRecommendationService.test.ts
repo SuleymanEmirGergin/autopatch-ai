@@ -29,10 +29,10 @@ describe("IntelligentRecommendationService", () => {
       }));
 
       (ImageRiskModel.find as jest.Mock).mockReturnValue({
-        exec: jest.fn().resolves(mockImages),
+        exec: jest.fn().mockResolvedValue(mockImages),
       });
 
-      await service.trainModel("test-cluster");
+      await service.trainPriorityModel();
 
       expect(service.isModelReady()).toBe(true);
     });

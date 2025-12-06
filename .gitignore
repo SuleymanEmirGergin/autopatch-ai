@@ -1,8 +1,8 @@
 # Dependencies
 node_modules/
 frontend/node_modules/
-package-lock.json
-frontend/package-lock.json
+# package-lock.json - CI için gerekli, ignore etme
+# frontend/package-lock.json
 
 # Build outputs
 dist/

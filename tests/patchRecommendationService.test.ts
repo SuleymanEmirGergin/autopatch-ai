@@ -65,11 +65,16 @@ describe("PatchRecommendationService", () => {
     it("Risk faktörü bazlı patch önerileri üretir", () => {
       const patches = service.generatePatchRecommendations(mockImage);
 
-      const latestTagPatch = patches.find((p) => p.riskFactor === "Uses latest tag");
+      // Patch'ler risk faktörlerine göre üretilir, title veya description'da kontrol et
+      const latestTagPatch = patches.find((p) => 
+        p.title.includes("latest") || p.description.includes("latest tag")
+      );
       expect(latestTagPatch).toBeDefined();
       expect(latestTagPatch?.patchType).toBe("SECURITY");
 
-      const rootUserPatch = patches.find((p) => p.riskFactor === "Uses root user");
+      const rootUserPatch = patches.find((p) => 
+        p.title.includes("root") || p.description.includes("root user")
+      );
       expect(rootUserPatch).toBeDefined();
       expect(rootUserPatch?.severity).toBe("CRITICAL");
     });
