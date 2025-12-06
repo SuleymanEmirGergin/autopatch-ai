@@ -142,8 +142,9 @@ describe("AutoActionService", () => {
       const policy = await service.createPolicy(mockPolicy as any);
       const result = await service.executePolicy(policy._id.toString());
 
-      expect(result.success).toBe(true);
-      expect(result.actionType).toBe("NOTIFY");
+      expect(result.items.length).toBeGreaterThan(0);
+      expect(result.items[0].actionType).toBe("NOTIFY");
+      expect(result.items[0].status).toBe("NOTIFIED");
     });
   });
 

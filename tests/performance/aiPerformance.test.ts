@@ -28,7 +28,7 @@ describe("AI Performance Tests", () => {
     };
 
     const startTime = Date.now();
-    await predictionService.predictRisk(mockImage as any, "test-cluster");
+    await predictionService.predictRisk(mockImage as any);
     const endTime = Date.now();
 
     const duration = endTime - startTime;
@@ -48,7 +48,10 @@ describe("AI Performance Tests", () => {
     }));
 
     const startTime = Date.now();
-    await predictionService.bulkPredictRisk(mockImages as any[], "test-cluster");
+    // Bulk prediction için her image'i tek tek predict et
+    for (const image of mockImages) {
+      await predictionService.predictRisk(image as any);
+    }
     const endTime = Date.now();
 
     const duration = endTime - startTime;
