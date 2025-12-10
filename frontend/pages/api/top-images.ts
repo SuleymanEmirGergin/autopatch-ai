@@ -19,7 +19,7 @@ export default async function handler(
 
   try {
     const backendRes = await fetch(
-      `${BACKEND_URL}/images/top?${params.toString()}`
+      `${BACKEND_URL}/api/images/top?${params.toString()}`
     );
 
     if (!backendRes.ok) {

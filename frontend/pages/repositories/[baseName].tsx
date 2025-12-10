@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import { GetServerSideProps } from "next";
+import MainLayout from "../../components/MainLayout";
 import { fetchImageTags, ImageTagsResponse } from "../../lib/api";
 
 interface Props {
@@ -9,158 +10,163 @@ interface Props {
 }
 
 function riskBadgeClass(level: string) {
-  switch (level) {
-    case "LOW":
-      return "badge badge-low";
-    case "MEDIUM":
-      return "badge badge-medium";
-    case "HIGH":
-      return "badge badge-high";
-    case "CRITICAL":
-      return "badge badge-critical";
-    default:
-      return "badge";
-  }
+  const colors: { [key: string]: string } = {
+    LOW: "#10B981",
+    MEDIUM: "#F59E0B",
+    HIGH: "#EF4444",
+    CRITICAL: "#DC2626",
+  };
+  return colors[level] || "#6B7280";
 }
 
 export default function RepositoryTagsPage({ tagsData, error }: Props) {
   return (
-    <div className="layout">
+    <MainLayout>
       <Head>
-        <title>
-          {tagsData?.baseName || "Repository"} Tags - AutoPatch AI
-        </title>
+        <title>{tagsData?.baseName || "Repository"} Tags - AutoPatch AI</title>
       </Head>
 
-      <header className="header">
-        <div className="header-title">
-          Repository Tags: {tagsData?.baseName || "Loading..."}
-        </div>
-        <div style={{ display: "flex", gap: 8 }}>
+      <div style={{ color: "white" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+          <div>
+            <h1 style={{ fontSize: "28px", fontWeight: 600, marginBottom: "8px" }}>
+              Repository: {tagsData?.baseName || "Loading..."}
+            </h1>
+            <p style={{ color: "#9CA3AF", fontSize: "14px" }}>
+              {tagsData ? `${tagsData.tags.length} tags found` : "Loading tags..."}
+            </p>
+          </div>
           <Link href="/repositories">
-            <button className="button button-secondary">Repositories</button>
-          </Link>
-          <Link href="/">
-            <button className="button button-secondary">Ana Sayfa</button>
+            <button
+              style={{
+                backgroundColor: "#374151",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                padding: "10px 20px",
+                cursor: "pointer",
+                fontSize: "14px",
+              }}
+            >
+              Back to Repositories
+            </button>
           </Link>
         </div>
-      </header>
 
-      <main className="container">
         {error && (
-          <p style={{ color: "#f87171", marginBottom: 16 }}>
-            Backend hatası: {error}
-          </p>
+          <div style={{ backgroundColor: "#1E293B", borderRadius: "12px", padding: "20px", border: "1px solid #334155", color: "#EF4444" }}>
+            Error: {error}
+          </div>
         )}
 
-        {!tagsData && !error && <p>Yükleniyor...</p>}
+        {!tagsData && !error && (
+          <div style={{ backgroundColor: "#1E293B", borderRadius: "12px", padding: "40px", border: "1px solid #334155", textAlign: "center", color: "#9CA3AF" }}>
+            Loading tags...
+          </div>
+        )}
 
         {tagsData && tagsData.tags.length === 0 && (
-          <p>Bu repository için tag bulunamadı.</p>
+          <div style={{ backgroundColor: "#1E293B", borderRadius: "12px", padding: "40px", border: "1px solid #334155", textAlign: "center", color: "#9CA3AF" }}>
+            No tags found for this repository
+          </div>
         )}
 
         {tagsData && tagsData.tags.length > 0 && (
-          <>
-            <div className="muted" style={{ marginBottom: 16 }}>
-              {tagsData.tags.length} tag bulundu. Tag'ler versiyon sırasına göre
-              listelenmiştir.
-            </div>
-
-            <div className="grid">
-              {tagsData.tags.map((tagInfo) => (
-                <Link
-                  key={tagInfo.imageName}
-                  href={`/images/${encodeURIComponent(tagInfo.imageName)}`}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "16px" }}>
+            {tagsData.tags.map((tagInfo) => (
+              <Link key={tagInfo.imageName} href={`/images/${encodeURIComponent(tagInfo.imageName)}`}>
+                <div
+                  style={{
+                    backgroundColor: "#1E293B",
+                    borderRadius: "12px",
+                    padding: "20px",
+                    border: "1px solid #334155",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "#2563EB";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "#334155";
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
                 >
-                  <div className="card">
-                    <div className="muted" style={{ fontSize: 12 }}>
-                      Tag
-                    </div>
-                    <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 8 }}>
-                      {tagInfo.tag}
-                    </div>
+                  <div style={{ color: "#9CA3AF", fontSize: "12px", marginBottom: "8px" }}>Tag</div>
+                  <div style={{ fontSize: "16px", fontWeight: 600, marginBottom: "12px", color: "#CBD5E0" }}>
+                    {tagInfo.tag}
+                  </div>
 
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                    <div>
+                      <div style={{ color: "#9CA3AF", fontSize: "12px", marginBottom: "4px" }}>Risk Score</div>
+                      <div style={{ fontSize: "20px", fontWeight: 600 }}>{tagInfo.riskScore}</div>
+                    </div>
                     <div
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        marginTop: 8,
+                        padding: "6px 12px",
+                        borderRadius: "6px",
+                        backgroundColor: riskBadgeClass(tagInfo.riskLevel),
+                        color: "white",
+                        fontSize: "12px",
+                        fontWeight: 600,
                       }}
                     >
+                      {tagInfo.riskLevel}
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", gap: "16px", marginBottom: "12px", fontSize: "12px", color: "#9CA3AF" }}>
+                    <div>
+                      <span>Pods:</span> <strong style={{ color: "#CBD5E0" }}>{tagInfo.pods.length}</strong>
+                    </div>
+                    {tagInfo.pods.some(
+                      (p) =>
+                        p.namespace.toLowerCase() === "prod" ||
+                        p.namespace.toLowerCase().startsWith("prod-")
+                    ) && (
                       <div>
-                        <div className="muted" style={{ fontSize: 12 }}>
-                          Risk Score
-                        </div>
-                        <div className="risk-score">{tagInfo.riskScore}</div>
+                        <span>Prod:</span>{" "}
+                        <strong style={{ color: "#F59E0B" }}>
+                          {
+                            tagInfo.pods.filter(
+                              (p) =>
+                                p.namespace.toLowerCase() === "prod" ||
+                                p.namespace.toLowerCase().startsWith("prod-")
+                            ).length
+                          }
+                        </strong>
                       </div>
-                      <span className={riskBadgeClass(tagInfo.riskLevel)}>
-                        {tagInfo.riskLevel}
-                      </span>
-                    </div>
+                    )}
+                  </div>
 
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: 16,
-                        marginTop: 12,
-                        fontSize: 12,
-                      }}
-                    >
-                      <div>
-                        <span className="muted">Pods:</span>{" "}
-                        <strong>{tagInfo.pods.length}</strong>
-                      </div>
-                      {tagInfo.pods.some(
-                        (p) =>
-                          p.namespace.toLowerCase() === "prod" ||
-                          p.namespace.toLowerCase().startsWith("prod-")
-                      ) && (
-                        <div>
-                          <span className="muted">Prod:</span>{" "}
-                          <strong style={{ color: "#fbbf24" }}>
-                            {
-                              tagInfo.pods.filter(
-                                (p) =>
-                                  p.namespace.toLowerCase() === "prod" ||
-                                  p.namespace.toLowerCase().startsWith("prod-")
-                              ).length
-                            }
-                          </strong>
-                        </div>
-                      )}
-                    </div>
+                  <div style={{ color: "#9CA3AF", fontSize: "11px", marginBottom: "8px" }}>
+                    Last scanned: {new Date(tagInfo.lastScannedAt).toLocaleString()}
+                  </div>
 
-                    <div className="muted" style={{ marginTop: 8, fontSize: 11 }}>
-                      Son tarama:{" "}
-                      {new Date(tagInfo.lastScannedAt).toLocaleString()}
-                    </div>
-
-                    <div style={{ marginTop: 8 }}>
-                      <div className="muted" style={{ fontSize: 11, marginBottom: 4 }}>
-                        Pods:
-                      </div>
-                      <div style={{ fontSize: 11 }}>
+                  {tagInfo.pods.length > 0 && (
+                    <div style={{ marginTop: "12px", paddingTop: "12px", borderTop: "1px solid #334155" }}>
+                      <div style={{ color: "#9CA3AF", fontSize: "11px", marginBottom: "4px" }}>Pods:</div>
+                      <div style={{ fontSize: "11px", color: "#CBD5E0" }}>
                         {tagInfo.pods.slice(0, 3).map((p, idx) => (
-                          <div key={idx} className="muted">
+                          <div key={idx} style={{ marginBottom: "2px" }}>
                             {p.namespace}/{p.name}
                           </div>
                         ))}
                         {tagInfo.pods.length > 3 && (
-                          <div className="muted">
-                            +{tagInfo.pods.length - 3} daha...
-                          </div>
+                          <div style={{ color: "#9CA3AF" }}>+{tagInfo.pods.length - 3} more...</div>
                         )}
                       </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
         )}
-      </main>
-    </div>
+      </div>
+    </MainLayout>
   );
 }
 
@@ -170,7 +176,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
     return {
       props: {
         tagsData: null,
-        error: "Geçersiz repository adı",
+        error: "Invalid repository name",
       },
     };
   }
@@ -178,19 +184,15 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   const decoded = decodeURIComponent(baseNameParam);
 
   try {
-    // Base name'den bir örnek image name oluştur (tag olmadan)
-    // Eğer base name'de tag varsa kaldır
     const imageName = decoded.includes(":") ? decoded : `${decoded}:latest`;
     const tagsData = await fetchImageTags(imageName);
     return { props: { tagsData } };
   } catch (e: any) {
-    console.error("Error in getServerSideProps:", e);
     return {
       props: {
         tagsData: null,
-        error: e.message || "Backend'den tag bilgisi alınamadı.",
+        error: e.message || "Failed to fetch tags",
       },
     };
   }
 };
-

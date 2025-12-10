@@ -29,7 +29,7 @@ export default async function handler(
   }
 
   try {
-    const backendRes = await fetch(`${BACKEND_URL}/tokens/${id}`, {
+    const backendRes = await fetch(`${BACKEND_URL}/api/tokens/${id}`, {
       method: "DELETE",
       headers: getHeaders(),
     });

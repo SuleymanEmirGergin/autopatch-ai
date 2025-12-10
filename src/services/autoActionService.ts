@@ -52,7 +52,8 @@ export class AutoActionService {
   }
 
   async deletePolicy(id: string) {
-    return AutoActionPolicyModel.findByIdAndDelete(id).exec();
+    const result = await AutoActionPolicyModel.findByIdAndDelete(id).exec();
+    return result !== null;
   }
 
   /**

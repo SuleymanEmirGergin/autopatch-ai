@@ -67,13 +67,13 @@ describe("PatchRecommendationService", () => {
 
       // Patch'ler risk faktörlerine göre üretilir, title veya description'da kontrol et
       const latestTagPatch = patches.find((p) => 
-        p.title.includes("latest") || p.description.includes("latest tag")
+        p.title.toLowerCase().includes("latest") || p.description.toLowerCase().includes("latest tag")
       );
       expect(latestTagPatch).toBeDefined();
       expect(latestTagPatch?.patchType).toBe("SECURITY");
 
       const rootUserPatch = patches.find((p) => 
-        p.title.includes("root") || p.description.includes("root user")
+        p.title.toLowerCase().includes("root") || p.description.toLowerCase().includes("root user")
       );
       expect(rootUserPatch).toBeDefined();
       expect(rootUserPatch?.severity).toBe("CRITICAL");

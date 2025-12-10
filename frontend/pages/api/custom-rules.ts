@@ -20,7 +20,7 @@ export default async function handler(
 ) {
   try {
     const queryString = req.url?.split("?")[1] || "";
-    const backendRes = await fetch(`${BACKEND_URL}/custom-rules${queryString ? `?${queryString}` : ""}`, {
+    const backendRes = await fetch(`${BACKEND_URL}/api/custom-rules${queryString ? `?${queryString}` : ""}`, {
       method: req.method,
       headers: getHeaders(),
       body: req.method === "POST" ? JSON.stringify(req.body) : undefined,

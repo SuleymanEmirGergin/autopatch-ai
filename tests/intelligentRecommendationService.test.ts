@@ -54,6 +54,7 @@ describe("IntelligentRecommendationService", () => {
         {
           id: "rec-1",
           type: "CRITICAL",
+          priority: 8,
           title: "Versioned tag'e geç",
           description: "Latest tag yerine versioned tag kullan",
           riskFactor: "Uses latest tag",
@@ -65,6 +66,7 @@ describe("IntelligentRecommendationService", () => {
         {
           id: "rec-2",
           type: "HIGH",
+          priority: 6,
           title: "Root user kaldır",
           description: "Non-root user kullan",
           riskFactor: "Uses root user",
@@ -83,7 +85,7 @@ describe("IntelligentRecommendationService", () => {
 
       expect(scored).toBeDefined();
       expect(scored.length).toBe(2);
-      scored.forEach(rec => {
+      scored.forEach((rec: any) => {
         expect(rec.aiScore).toBeGreaterThanOrEqual(0);
         expect(rec.aiScore).toBeLessThanOrEqual(10);
         expect(rec.mlConfidence).toBeGreaterThanOrEqual(0);

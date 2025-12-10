@@ -28,23 +28,23 @@ export default async function handler(
     let backendRes: Response;
 
     if (req.method === "DELETE") {
-      backendRes = await fetch(`${BACKEND_URL}/custom-rules/${id}`, {
+      backendRes = await fetch(`${BACKEND_URL}/api/custom-rules/${id}`, {
         method: "DELETE",
         headers: getHeaders(),
       });
     } else if (req.method === "PUT") {
-      backendRes = await fetch(`${BACKEND_URL}/custom-rules/${id}`, {
+      backendRes = await fetch(`${BACKEND_URL}/api/custom-rules/${id}`, {
         method: "PUT",
         headers: getHeaders(),
         body: JSON.stringify(req.body),
       });
     } else if (req.method === "POST" && req.url?.includes("/toggle")) {
-      backendRes = await fetch(`${BACKEND_URL}/custom-rules/${id}/toggle`, {
+      backendRes = await fetch(`${BACKEND_URL}/api/custom-rules/${id}/toggle`, {
         method: "POST",
         headers: getHeaders(),
       });
     } else {
-      backendRes = await fetch(`${BACKEND_URL}/custom-rules/${id}`, {
+      backendRes = await fetch(`${BACKEND_URL}/api/custom-rules/${id}`, {
         method: "GET",
         headers: getHeaders(),
       });

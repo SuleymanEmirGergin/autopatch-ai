@@ -6,12 +6,14 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "nodemon --watch src --exec ts-node src/server.ts",
+    "dev": "PORT=5001 nodemon --watch src --exec ts-node src/server.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:ai": "jest tests/mlRiskPredictionService.test.ts tests/aiAnomalyDetectionService.test.ts tests/intelligentRecommendationService.test.ts",
-    "generate-demo-data": "ts-node scripts/generate-demo-data.ts"
+    "generate-demo-data": "ts-node scripts/generate-demo-data.ts",
+    "generate-comprehensive-demo-data": "ts-node scripts/generate-comprehensive-demo-data.ts",
+    "load-all-demo-data": "npm run generate-demo-data && npm run generate-comprehensive-demo-data"
   },
   "keywords": [],
   "author": "",

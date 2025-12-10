@@ -26,7 +26,7 @@ export default async function handler(
 
   try {
     if (req.method === "PUT") {
-      const backendRes = await fetch(`${BACKEND_URL}/webhooks/${id}`, {
+      const backendRes = await fetch(`${BACKEND_URL}/api/webhooks/${id}`, {
         method: "PUT",
         headers: getHeaders(),
         body: JSON.stringify(req.body),
@@ -40,7 +40,7 @@ export default async function handler(
       const data = await backendRes.json();
       return res.status(backendRes.status).json(data);
     } else if (req.method === "DELETE") {
-      const backendRes = await fetch(`${BACKEND_URL}/webhooks/${id}`, {
+      const backendRes = await fetch(`${BACKEND_URL}/api/webhooks/${id}`, {
         method: "DELETE",
         headers: getHeaders(),
       });
@@ -52,7 +52,7 @@ export default async function handler(
 
       return res.status(204).end();
     } else if (req.method === "POST" && req.query.action === "test") {
-      const backendRes = await fetch(`${BACKEND_URL}/webhooks/${id}/test`, {
+      const backendRes = await fetch(`${BACKEND_URL}/api/webhooks/${id}/test`, {
         method: "POST",
         headers: getHeaders(),
       });

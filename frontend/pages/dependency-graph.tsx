@@ -1,185 +1,152 @@
 import Head from "next/head";
-import Link from "next/link";
 import { GetServerSideProps } from "next";
-import { useState, useCallback, useEffect } from "react";
-import ReactFlow, {
-  Node,
-  Edge,
-  Controls,
-  Background,
-  MiniMap,
-  useNodesState,
-  useEdgesState,
-  addEdge,
-  Connection,
-} from "reactflow";
-import "reactflow/dist/style.css";
-import { fetchDependencyGraph, DependencyGraph } from "../lib/api";
+import { useState } from "react";
+import MainLayout from "../components/MainLayout";
+import Link from "next/link";
 
-interface Props {
-  graph: DependencyGraph | null;
+interface DependencyNode {
+  imageName: string;
+  dependencies: string[];
+  dependents: string[];
+}
+
+export interface Props {
+  graph: DependencyNode[] | null;
   error?: string;
 }
 
-function riskLevelToColor(level: string): string {
-  switch (level) {
-    case "CRITICAL":
-      return "#ef4444";
-    case "HIGH":
-      return "#f87171";
-    case "MEDIUM":
-      return "#fbbf24";
-    case "LOW":
-      return "#10b981";
-    default:
-      return "#6b7280";
-  }
-}
-
 export default function DependencyGraphPage({ graph, error }: Props) {
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // Graph'i ReactFlow formatına dönüştür
-  useEffect(() => {
-    if (graph) {
-      const flowNodes: Node[] = graph.nodes.map((node, idx) => ({
-        id: node.id,
-        data: {
-          label: (
-            <div style={{ textAlign: "center", padding: 4 }}>
-              <div style={{ fontSize: 12, fontWeight: 500 }}>{node.label}</div>
-              {node.type === "derived" && (
-                <>
-                  <div
-                    style={{
-                      fontSize: 10,
-                      color: riskLevelToColor(node.riskLevel),
-                      marginTop: 2,
-                    }}
-                  >
-                    {node.riskScore} ({node.riskLevel})
-                  </div>
-                </>
-              )}
-            </div>
-          ),
-        },
-        position: { 
-          x: (idx % 5) * 200 + Math.random() * 50, 
-          y: Math.floor(idx / 5) * 150 + Math.random() * 50 
-        },
-        style: {
-          backgroundColor:
-            node.type === "base" ? "#1f2937" : riskLevelToColor(node.riskLevel),
-          color: "white",
-          border: `2px solid ${riskLevelToColor(node.riskLevel)}`,
-          borderRadius: 8,
-          padding: 8,
-          minWidth: 120,
-        },
-      }));
-
-      const flowEdges: Edge[] = graph.edges.map((edge) => ({
-        id: `${edge.from}-${edge.to}`,
-        source: edge.from,
-        target: edge.to,
-        type: "smoothstep",
-        animated: edge.type === "namespace",
-        style: {
-          stroke:
-            edge.type === "base" ? "#3b82f6" : "#10b981",
-          strokeWidth: 2,
-        },
-        label: edge.type === "base" ? "base" : "namespace",
-      }));
-
-      setNodes(flowNodes);
-      setEdges(flowEdges);
-    }
-  }, [graph]);
-
-  const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
+  const selectedNode = graph?.find(node => node.imageName === selectedImage);
 
   return (
-    <div className="layout">
+    <MainLayout>
       <Head>
-        <title>Image Bağımlılık Grafiği - AutoPatch AI</title>
+        <title>Dependency Graph - AutoPatch AI</title>
       </Head>
 
-      <header className="header">
-        <div className="header-title">Image Bağımlılık Grafiği</div>
-        <Link href="/">
-          <button className="button button-secondary">Ana Sayfa</button>
-        </Link>
-      </header>
+      <div style={{ color: "white" }}>
+        <h1 style={{ fontSize: "28px", fontWeight: 600, marginBottom: "8px" }}>Dependency Graph</h1>
+        <p style={{ color: "#9CA3AF", fontSize: "14px", marginBottom: "24px" }}>
+          Visualize dependencies between container images
+        </p>
 
-      <main className="container" style={{ height: "calc(100vh - 80px)" }}>
         {error && (
-          <p style={{ color: "#f87171", marginBottom: 16 }}>
-            Backend hatası: {error}
-          </p>
+          <div style={{ backgroundColor: "#1E293B", borderRadius: "12px", padding: "20px", border: "1px solid #334155", color: "#EF4444" }}>
+            Error: {error}
+          </div>
         )}
 
-        {!graph && !error && <p>Yükleniyor...</p>}
-
-        {graph && (
-          <>
-            <div style={{ marginBottom: 16 }}>
-              <div className="muted" style={{ fontSize: 12 }}>
-                Toplam {graph.nodes.length} node, {graph.edges.length} bağlantı
-              </div>
-              <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 12 }}>
-                <div>
-                  <span style={{ color: "#3b82f6" }}>●</span> Base image bağımlılıkları
-                </div>
-                <div>
-                  <span style={{ color: "#10b981" }}>●</span> Namespace bağlantıları
-                </div>
+        {!error && graph && graph.length > 0 && (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 400px", gap: "24px" }}>
+            {/* Graph Visualization Area */}
+            <div style={{ backgroundColor: "#1E293B", borderRadius: "12px", padding: "20px", border: "1px solid #334155", minHeight: "600px" }}>
+              <div style={{ color: "#9CA3AF", fontSize: "14px", textAlign: "center", padding: "40px" }}>
+                Graph visualization will be rendered here
+                <br />
+                <span style={{ fontSize: "12px" }}>(Interactive graph component to be implemented)</span>
               </div>
             </div>
 
-            <div style={{ width: "100%", height: "calc(100vh - 200px)", border: "1px solid #374151", borderRadius: 4 }}>
-              <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                onConnect={onConnect}
-                fitView
-              >
-                <Controls />
-                <Background />
-                <MiniMap
-                  nodeColor={(node) => {
-                    const data = node.data as any;
-                    return data?.style?.backgroundColor || "#1f2937";
-                  }}
-                />
-              </ReactFlow>
+            {/* Sidebar */}
+            <div>
+              <div style={{ backgroundColor: "#1E293B", borderRadius: "12px", padding: "20px", border: "1px solid #334155", marginBottom: "16px" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px" }}>Images ({graph.length})</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", maxHeight: "400px", overflowY: "auto" }}>
+                  {graph.map((node, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedImage(node.imageName)}
+                      style={{
+                        padding: "10px",
+                        backgroundColor: selectedImage === node.imageName ? "#2563EB" : "#0F172A",
+                        border: "1px solid #334155",
+                        borderRadius: "6px",
+                        color: "white",
+                        textAlign: "left",
+                        cursor: "pointer",
+                        fontSize: "13px",
+                      }}
+                    >
+                      {node.imageName}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {selectedNode && (
+                <div style={{ backgroundColor: "#1E293B", borderRadius: "12px", padding: "20px", border: "1px solid #334155" }}>
+                  <h3 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px" }}>Selected: {selectedNode.imageName}</h3>
+                  <Link href={`/images/${encodeURIComponent(selectedNode.imageName)}`}>
+                    <a style={{ color: "#60A5FA", textDecoration: "none", fontSize: "13px", marginBottom: "16px", display: "block" }}>
+                      View Details →
+                    </a>
+                  </Link>
+                  {selectedNode.dependencies.length > 0 && (
+                    <div style={{ marginBottom: "16px" }}>
+                      <div style={{ color: "#9CA3AF", fontSize: "12px", marginBottom: "8px" }}>Depends On ({selectedNode.dependencies.length})</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                        {selectedNode.dependencies.map((dep, idx) => (
+                          <div key={idx} style={{ padding: "6px", backgroundColor: "#0F172A", borderRadius: "4px", fontSize: "12px" }}>
+                            {dep}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {selectedNode.dependents.length > 0 && (
+                    <div>
+                      <div style={{ color: "#9CA3AF", fontSize: "12px", marginBottom: "8px" }}>Dependents ({selectedNode.dependents.length})</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                        {selectedNode.dependents.map((dep, idx) => (
+                          <div key={idx} style={{ padding: "6px", backgroundColor: "#0F172A", borderRadius: "4px", fontSize: "12px" }}>
+                            {dep}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          </>
+          </div>
         )}
-      </main>
-    </div>
+
+        {!error && (!graph || graph.length === 0) && (
+          <div style={{ backgroundColor: "#1E293B", borderRadius: "12px", padding: "40px", border: "1px solid #334155", textAlign: "center", color: "#9CA3AF" }}>
+            No dependency data available
+          </div>
+        )}
+      </div>
+    </MainLayout>
   );
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   try {
-    const graph = await fetchDependencyGraph();
+    const { fetchDependencyGraph } = await import("../lib/api");
+    const graphData = await fetchDependencyGraph();
+    const graph = graphData.nodes.map((node: any) => ({
+      imageName: node.imageName,
+      dependencies: graphData.edges
+        .filter((e: any) => e.to === node.id)
+        .map((e: any) => {
+          const depNode = graphData.nodes.find((n: any) => n.id === e.from);
+          return depNode?.imageName || "";
+        })
+        .filter(Boolean),
+      dependents: graphData.edges
+        .filter((e: any) => e.from === node.id)
+        .map((e: any) => {
+          const depNode = graphData.nodes.find((n: any) => n.id === e.to);
+          return depNode?.imageName || "";
+        })
+        .filter(Boolean),
+    }));
     return { props: { graph } };
-  } catch (e: any) {
-    console.error("Error in getServerSideProps:", e);
-    return {
-      props: {
-        graph: null,
-        error: e.message || "Backend'den grafik alınamadı.",
-      },
-    };
+  } catch (error: any) {
+    console.error("Error fetching dependency graph:", error);
+    return { props: { graph: null, error: error.message || "Failed to fetch dependency graph" } };
   }
 };
-

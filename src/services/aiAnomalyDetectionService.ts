@@ -376,6 +376,31 @@ export class AIAnomalyDetectionService {
   }
 
   /**
+   * Model eğitir (trainAutoencoder için alias)
+   */
+  async trainModel(clusterId?: string): Promise<void> {
+    return this.trainAutoencoder(clusterId);
+  }
+
+  /**
+   * Tüm image'ler için anomali tespiti yapar
+   */
+  async detectAllAnomalies(clusterId: string, limit: number = 100): Promise<AIAnomalyResult[]> {
+    const images = await ImageRiskModel.find({ clusterId })
+      .limit(limit)
+      .exec();
+
+    const results: AIAnomalyResult[] = [];
+
+    for (const image of images) {
+      const result = await this.detectAIAnomaly(image);
+      results.push(result);
+    }
+
+    return results;
+  }
+
+  /**
    * Model durumunu kontrol eder
    */
   isModelReady(): boolean {

@@ -19,7 +19,7 @@ export default async function handler(
 ) {
   if (req.method === "GET") {
     try {
-      const backendRes = await fetch(`${BACKEND_URL}/allowlist`, {
+      const backendRes = await fetch(`${BACKEND_URL}/api/allowlist`, {
         headers: getHeaders(),
       });
 
@@ -37,7 +37,7 @@ export default async function handler(
 
   if (req.method === "POST") {
     try {
-      const backendRes = await fetch(`${BACKEND_URL}/allowlist`, {
+      const backendRes = await fetch(`${BACKEND_URL}/api/allowlist`, {
         method: "POST",
         headers: {
           ...getHeaders(),

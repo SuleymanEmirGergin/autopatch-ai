@@ -256,7 +256,10 @@ jobs:
         title: "Latest Tag Remediation (GitLab CI)",
         description: "GitLab CI pipeline ile latest tag'i değiştirin",
         riskFactor: "Uses latest tag",
-        script: `remediate_latest_tag:
+        script: `stages:
+  - deploy
+
+remediate_latest_tag:
   stage: deploy
   image: bitnami/kubectl:latest
   variables:
@@ -606,7 +609,10 @@ jobs:
     namespace: string,
     title: string
   ): string {
-    return `remediate:
+    return `stages:
+  - deploy
+
+remediate:
   stage: deploy
   image: bitnami/kubectl:latest
   variables:

@@ -26,7 +26,7 @@ export default async function handler(
 
   try {
     if (req.method === "PUT") {
-      const backendRes = await fetch(`${BACKEND_URL}/risk-budgets/${id}`, {
+      const backendRes = await fetch(`${BACKEND_URL}/api/risk-budgets/${id}`, {
         method: "PUT",
         headers: getHeaders(),
         body: JSON.stringify(req.body),
@@ -40,7 +40,7 @@ export default async function handler(
       const data = await backendRes.json();
       return res.status(backendRes.status).json(data);
     } else if (req.method === "DELETE") {
-      const backendRes = await fetch(`${BACKEND_URL}/risk-budgets/${id}`, {
+      const backendRes = await fetch(`${BACKEND_URL}/api/risk-budgets/${id}`, {
         method: "DELETE",
         headers: getHeaders(),
       });
@@ -52,7 +52,7 @@ export default async function handler(
 
       return res.status(204).end();
     } else if (req.method === "POST" && req.query.action === "check") {
-      const backendRes = await fetch(`${BACKEND_URL}/risk-budgets/${id}/check`, {
+      const backendRes = await fetch(`${BACKEND_URL}/api/risk-budgets/${id}/check`, {
         method: "POST",
         headers: getHeaders(),
       });

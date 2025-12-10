@@ -21,7 +21,7 @@ export default async function handler(
     }
 
     const backendRes = await fetch(
-      `${BACKEND_URL}/images/export/pdf?${params.toString()}`
+      `${BACKEND_URL}/api/images/export/pdf?${params.toString()}`
     );
 
     if (!backendRes.ok) {

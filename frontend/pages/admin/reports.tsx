@@ -16,10 +16,6 @@ const IS_READONLY =
   typeof process !== "undefined" &&
   process.env.NEXT_PUBLIC_READONLY === "true";
 
-const IS_READONLY =
-  typeof process !== "undefined" &&
-  process.env.NEXT_PUBLIC_READONLY === "true";
-
 const REPORT_TYPES: { value: ReportType; label: string; description: string }[] = [
   {
     value: "RISK_SUMMARY",

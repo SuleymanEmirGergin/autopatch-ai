@@ -12,7 +12,7 @@ export default async function handler(
   }
 
   try {
-    const backendRes = await fetch(`${BACKEND_URL}/images`);
+    const backendRes = await fetch(`${BACKEND_URL}/api/images`);
 
     if (!backendRes.ok) {
       const text = await backendRes.text();

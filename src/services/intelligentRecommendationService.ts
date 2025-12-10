@@ -192,7 +192,8 @@ export class IntelligentRecommendationService {
     recommendation: Recommendation,
     image: ImageRiskDocument
   ): number {
-    let score = recommendation.priority; // Base priority
+    // Base priority - eğer yoksa type'a göre belirle
+    let score = recommendation.priority || (recommendation.type === "CRITICAL" ? 8 : recommendation.type === "HIGH" ? 6 : recommendation.type === "MEDIUM" ? 4 : 2);
 
     // Risk seviyesine göre artır
     if (image.riskLevel === "CRITICAL") score += 2;
@@ -203,7 +204,7 @@ export class IntelligentRecommendationService {
     if (recommendation.riskFactor === "Uses root user") score += 1.5;
 
     // Estimated risk reduction'a göre artır
-    score += recommendation.estimatedRiskReduction / 10;
+    score += (recommendation.estimatedRiskReduction || 0) / 10;
 
     // Effort'a göre azalt (kolay uygulanabilir öneriler öncelikli)
     if (recommendation.effort === "LOW") score += 1;
@@ -321,6 +322,37 @@ export class IntelligentRecommendationService {
     return reasons.length > 0
       ? `AI önerisi: ${reasons.join(", ")}`
       : "AI tarafından önerildi";
+  }
+
+  /**
+   * Önerileri AI ile score'lar
+   */
+  async scoreRecommendations(
+    image: ImageRiskDocument,
+    recommendations: Recommendation[],
+    clusterId?: string
+  ): Promise<IntelligentRecommendation[]> {
+    const intelligentRecommendations: IntelligentRecommendation[] = [];
+
+    for (const recommendation of recommendations) {
+      const aiScore = await this.calculateAIScore(recommendation, image);
+      const mlConfidence = this.calculateMLConfidence(recommendation, image);
+      const predictedImpact = this.predictImpact(recommendation, image);
+      const urgency = this.determineUrgency(aiScore, image.riskScore);
+      const reasoning = this.generateReasoning(recommendation, image, aiScore);
+
+      intelligentRecommendations.push({
+        ...recommendation,
+        aiScore,
+        mlConfidence,
+        predictedImpact,
+        urgency,
+        reasoning,
+      });
+    }
+
+    // AI score'a göre sırala
+    return intelligentRecommendations.sort((a, b) => b.aiScore - a.aiScore);
   }
 
   /**

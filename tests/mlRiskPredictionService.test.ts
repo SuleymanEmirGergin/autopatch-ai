@@ -1,9 +1,11 @@
 import { MLRiskPredictionService } from "../src/services/mlRiskPredictionService";
 import { ImageRiskModel } from "../src/persistence/imageRisk.model";
+import { ScanRunModel } from "../src/persistence/scanRun.model";
 import * as tf from "@tensorflow/tfjs-node";
 
 // Mock ImageRiskModel
 jest.mock("../src/persistence/imageRisk.model");
+jest.mock("../src/persistence/scanRun.model");
 
 describe("MLRiskPredictionService", () => {
   let service: MLRiskPredictionService;
@@ -30,8 +32,27 @@ describe("MLRiskPredictionService", () => {
         clusterId: "test-cluster",
       }));
 
-      (ImageRiskModel.find as jest.Mock).mockReturnValue({
-        exec: jest.fn().resolves(mockImages),
+      const mockScanRuns = Array.from({ length: 10 }, (_, i) => ({
+        _id: `scan-${i}`,
+        status: "COMPLETED",
+        startedAt: new Date(),
+        images: mockImages.slice(0, 2).map(img => ({
+          imageName: img.imageName,
+          clusterId: "test-cluster",
+          riskScore: img.riskScore,
+        })),
+      }));
+
+      (ScanRunModel.find as jest.Mock).mockReturnValue({
+        sort: jest.fn().mockReturnValue({
+          limit: jest.fn().mockReturnValue({
+            exec: jest.fn().mockResolvedValue(mockScanRuns),
+          }),
+        }),
+      });
+
+      (ImageRiskModel.findOne as jest.Mock).mockReturnValue({
+        exec: jest.fn().mockResolvedValue(mockImages[0]),
       });
 
       await service.trainModel("test-cluster");
@@ -50,8 +71,27 @@ describe("MLRiskPredictionService", () => {
         clusterId: "test-cluster",
       }));
 
-      (ImageRiskModel.find as jest.Mock).mockReturnValue({
-        exec: jest.fn().resolves(mockImages),
+      const mockScanRuns = Array.from({ length: 2 }, (_, i) => ({
+        _id: `scan-${i}`,
+        status: "COMPLETED",
+        startedAt: new Date(),
+        images: mockImages.slice(0, 2).map(img => ({
+          imageName: img.imageName,
+          clusterId: "test-cluster",
+          riskScore: img.riskScore,
+        })),
+      }));
+
+      (ScanRunModel.find as jest.Mock).mockReturnValue({
+        sort: jest.fn().mockReturnValue({
+          limit: jest.fn().mockReturnValue({
+            exec: jest.fn().mockResolvedValue(mockScanRuns),
+          }),
+        }),
+      });
+
+      (ImageRiskModel.findOne as jest.Mock).mockReturnValue({
+        exec: jest.fn().mockResolvedValue(mockImages[0]),
       });
 
       await service.trainModel("test-cluster");
@@ -81,7 +121,7 @@ describe("MLRiskPredictionService", () => {
       (ImageRiskModel.find as jest.Mock).mockReturnValue({
         sort: jest.fn().mockReturnValue({
           limit: jest.fn().mockReturnValue({
-            exec: jest.fn().resolves(mockHistory),
+            exec: jest.fn().mockResolvedValue(mockHistory),
           }),
         }),
       });
@@ -97,13 +137,38 @@ describe("MLRiskPredictionService", () => {
         clusterId: "test-cluster",
       }));
 
-      (ImageRiskModel.find as jest.Mock).mockReturnValueOnce({
-        exec: jest.fn().resolves(mockImages),
+      const mockScanRuns = Array.from({ length: 10 }, (_, i) => ({
+        _id: `scan-${i}`,
+        status: "COMPLETED",
+        startedAt: new Date(),
+        images: mockImages.slice(0, 2).map(img => ({
+          imageName: img.imageName,
+          clusterId: "test-cluster",
+          riskScore: img.riskScore,
+        })),
+      }));
+
+      (ScanRunModel.find as jest.Mock).mockReturnValueOnce({
+        sort: jest.fn().mockReturnValue({
+          limit: jest.fn().mockReturnValue({
+            exec: jest.fn().mockResolvedValue(mockScanRuns),
+          }),
+        }),
+      }).mockReturnValue({
+        sort: jest.fn().mockReturnValue({
+          limit: jest.fn().mockReturnValue({
+            exec: jest.fn().mockResolvedValue([]),
+          }),
+        }),
+      });
+
+      (ImageRiskModel.findOne as jest.Mock).mockReturnValue({
+        exec: jest.fn().mockResolvedValue(mockImages[0]),
       });
 
       await service.trainModel("test-cluster");
 
-      const prediction = await service.predictRisk(mockImage as any, "test-cluster");
+      const prediction = await service.predictRisk(mockImage as any);
 
       expect(prediction).toBeDefined();
       expect(prediction.predictedRiskScore).toBeGreaterThanOrEqual(0);
@@ -127,12 +192,12 @@ describe("MLRiskPredictionService", () => {
       (ImageRiskModel.find as jest.Mock).mockReturnValue({
         sort: jest.fn().mockReturnValue({
           limit: jest.fn().mockReturnValue({
-            exec: jest.fn().resolves([]),
+            exec: jest.fn().mockResolvedValue([]),
           }),
         }),
       });
 
-      const prediction = await service.predictRisk(mockImage as any, "test-cluster");
+      const prediction = await service.predictRisk(mockImage as any);
 
       expect(prediction).toBeDefined();
       expect(prediction.predictedRiskScore).toBeGreaterThanOrEqual(0);
@@ -166,15 +231,15 @@ describe("MLRiskPredictionService", () => {
       (ImageRiskModel.find as jest.Mock).mockReturnValue({
         sort: jest.fn().mockReturnValue({
           limit: jest.fn().mockReturnValue({
-            exec: jest.fn().resolves([]),
+            exec: jest.fn().mockResolvedValue([]),
           }),
         }),
       });
 
-      const predictions = await service.bulkPredictRisk(mockImages as any[], "test-cluster");
+      const predictions = await service.bulkPredictRisk(mockImages as any[]);
 
       expect(predictions).toHaveLength(2);
-      predictions.forEach(prediction => {
+      predictions.forEach((prediction: any) => {
         expect(prediction.predictedRiskScore).toBeGreaterThanOrEqual(0);
         expect(prediction.predictedRiskScore).toBeLessThanOrEqual(100);
       });

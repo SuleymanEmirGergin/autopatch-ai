@@ -34,5 +34,31 @@ export class DependencyController {
       next(err);
     }
   };
+
+  /**
+   * Cluster için bağımlılık grafiğini döndürür
+   */
+  getClusterDependencies = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { clusterId } = req.params;
+      const projectId = req.query.projectId as string | undefined;
+      
+      // Cluster'daki image'leri al
+      const images = await this.imageRepo.findAll(clusterId, projectId);
+      const graph = this.graphService.buildGraph(images);
+      
+      res.json({
+        clusterId,
+        projectId,
+        ...graph,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
 }
 

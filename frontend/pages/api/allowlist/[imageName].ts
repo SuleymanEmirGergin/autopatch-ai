@@ -24,7 +24,7 @@ export default async function handler(
     }
 
     const encoded = encodeURIComponent(imageName);
-    const backendRes = await fetch(`${BACKEND_URL}/allowlist/${encoded}`, {
+    const backendRes = await fetch(`${BACKEND_URL}/api/allowlist/${encoded}`, {
       method: "DELETE",
       headers,
     });

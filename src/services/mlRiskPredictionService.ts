@@ -48,7 +48,7 @@ export class MLRiskPredictionService {
             inputShape: [trainingData.features[0].length],
             units: 64,
             activation: "relu",
-            kernelRegularizer: tf.regularizers.l2({ l2: 0.01 }),
+            kernelRegularizer: tf.regularizers?.l2({ l2: 0.01 }),
           }),
           tf.layers.dropout({ rate: 0.2 }),
           tf.layers.dense({
@@ -358,6 +358,20 @@ export class MLRiskPredictionService {
     });
 
     return impacts;
+  }
+
+  /**
+   * Birden fazla image için toplu risk tahmini yapar
+   */
+  async bulkPredictRisk(images: ImageRiskDocument[]): Promise<RiskPrediction[]> {
+    const predictions: RiskPrediction[] = [];
+    
+    for (const image of images) {
+      const prediction = await this.predictRisk(image);
+      predictions.push(prediction);
+    }
+    
+    return predictions;
   }
 
   /**

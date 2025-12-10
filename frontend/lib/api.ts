@@ -16,7 +16,7 @@ const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ||
   (typeof window !== "undefined"
     ? "/api"
-    : process.env.BACKEND_URL || "http://localhost:5000");
+    : (process.env.BACKEND_URL || "http://localhost:5000") + "/api");
 
 // Admin işlemleri için (SSR veya server-side çağrılar için) isteğe bağlı header üretici.
 // Tarayıcıdan gelen isteklerde bu header kullanılmıyor; admin anahtarı Next.js API route'larında kullanılıyor.
@@ -3676,6 +3676,55 @@ export async function extractVisualFeatures(imageName: string): Promise<{
     throw new Error(data.error || "Failed to extract visual features");
   }
   return res.json().then(r => r.data);
+}
+
+// ==================== Scorecard APIs ====================
+
+export interface ImageScorecard {
+  imageName: string;
+  overallScore: number;
+  categoryScores: {
+    versioning: number;
+    security: number;
+    compliance: number;
+    operations: number;
+  };
+  strengths: string[];
+  weaknesses: string[];
+  recommendations: string[];
+  lastUpdated: string;
+}
+
+export async function fetchImageScorecard(imageName: string): Promise<ImageScorecard> {
+  const encoded = encodeURIComponent(imageName);
+  const res = await fetch(`${BACKEND_URL}/scorecard/${encoded}`, {
+    headers: getHeaders(),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Failed to fetch scorecard");
+  }
+  return res.json();
+}
+
+export async function fetchAllScorecards(): Promise<ImageScorecard[]> {
+  // Backend'de tüm scorecard'ları getiren endpoint yok, image listesinden alıyoruz
+  const { fetchImages } = await import("./api");
+  const images = await fetchImages();
+  const scorecards: ImageScorecard[] = [];
+  
+  // Her image için scorecard al (ilk 20 image için)
+  for (const image of images.slice(0, 20)) {
+    try {
+      const scorecard = await fetchImageScorecard(image.imageName);
+      scorecards.push(scorecard);
+    } catch (err) {
+      // Hata durumunda devam et
+      console.warn(`Failed to fetch scorecard for ${image.imageName}:`, err);
+    }
+  }
+  
+  return scorecards;
 }
 
 // ==================== Generative AI APIs ====================

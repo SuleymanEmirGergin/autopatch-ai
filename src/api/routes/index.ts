@@ -100,7 +100,7 @@ export function createRouter(wsService?: WebSocketService): Router {
   const apiTokenController = new ApiTokenController();
   const jiraController = new JiraController();
   const runbookController = new RunbookController();
-  const clusterController = new ClusterController();
+  const clusterController = new ClusterController(scanService);
   const riskBudgetController = new RiskBudgetController();
   const sbomController = new SBOMController();
   const anomalyController = new AnomalyController();
@@ -296,6 +296,7 @@ export function createRouter(wsService?: WebSocketService): Router {
   // Dependency graph
   router.get("/dependency-graph", dependencyController.getGraph);
   router.get("/dependency-graph/image/:imageName", dependencyController.getImageDependencies);
+  router.get("/dependency-graph/cluster/:clusterId", apiKeyAuth, dependencyController.getClusterDependencies);
 
   // Compliance reporting - TODO: Method'lar eklenecek
   // router.get("/compliance/:standard", complianceController.getReport);
@@ -342,6 +343,10 @@ export function createRouter(wsService?: WebSocketService): Router {
   // Cluster yönetimi (public, herkes erişebilir)
   router.get("/clusters", clusterController.listClusters);
   router.get("/clusters/:clusterId/stats", clusterController.getClusterStats);
+  router.get("/clusters/:clusterId/pods", clusterController.getClusterPods);
+  router.get("/clusters/:clusterId/images", clusterController.getClusterImages);
+  router.get("/clusters/:clusterId/risk-summary", clusterController.getClusterRiskSummary);
+  router.post("/clusters/:clusterId/scan", apiKeyAuth, clusterController.scanCluster);
 
   // Risk Budget yönetimi (protected)
   router.get("/risk-budgets", apiKeyAuth, riskBudgetController.list);
@@ -390,6 +395,8 @@ export function createRouter(wsService?: WebSocketService): Router {
 
   // Compliance endpoints
   router.get("/compliance", apiKeyAuth, complianceController.list);
+  router.get("/compliance/frameworks", apiKeyAuth, complianceController.getFrameworks);
+  router.get("/compliance/assessments", apiKeyAuth, complianceController.listAssessments);
   router.get("/compliance/:standard", apiKeyAuth, complianceController.getLatest);
   router.post("/compliance/:standard/assess", apiKeyAuth, requireRole("admin"), complianceController.assess);
 

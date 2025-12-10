@@ -1,42 +1,53 @@
-import express from "express";
-import { Server as HttpServer } from "http";
+import http from "http";
+import express, { Express } from "express";
+import cors from "cors";
 import mongoose from "mongoose";
+import dotenv from "dotenv";
 import { createRouter } from "./api/routes";
-import { config } from "./config";
-import swaggerUi from "swagger-ui-express";
-import { openApiSpec } from "./docs/openapi";
 import { WebSocketService } from "./services/websocketService";
+import { config } from "./config";
 
-export async function createApp() {
-  await mongoose.connect(config.mongoUri);
+dotenv.config();
+
+/**
+ * Uygulamayı ayağa kaldırır, MongoDB'ye bağlanır ve WebSocket'i hazırlar.
+ * server.ts tarafından çağrılır.
+ */
+export async function createApp(): Promise<{
+  app: Express;
+  httpServer: http.Server;
+  wsService: WebSocketService;
+}> {
+  const mongoUri =
+    process.env.MONGODB_URI ||
+    process.env.MONGO_URI ||
+    config.mongoUri ||
+    "mongodb://127.0.0.1:27017/autopatch-ai";
+
+  console.log("🔌 MONGODB_URI =>", mongoUri);
+
+  await mongoose.connect(mongoUri);
+  console.log("✅ MongoDB connected");
 
   const app = express();
-  app.use(express.json());
+  app.use(cors());
+  app.use(express.json({ limit: "10mb" }));
 
-  // HTTP server oluştur (WebSocket için gerekli)
-  const httpServer = new HttpServer(app);
-
-  // WebSocket servisini başlat
-  const wsService = new WebSocketService();
-  wsService.initialize(httpServer);
+  // Health endpoints
+  app.get("/health", (_req, res) => {
+    res.json({ status: "ok" });
+  });
+  app.get("/", (_req, res) => {
+    res.json({ status: "ok" });
+  });
 
   // API routes
-  app.use("/", createRouter(wsService));
+  const wsService = new WebSocketService();
+  const router = createRouter(wsService);
+  app.use("/api", router);
 
-  // Swagger docs (opsiyonel)
-  app.use("/docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
-
-  // 404 handler - Route bulunamadığında (routes'tan sonra, error handler'dan önce)
-  const { notFoundHandler, errorHandler } = require("./api/middleware/errorHandler");
-  app.use(notFoundHandler);
-
-  // Merkezi hata yakalama middleware'i (en sonda olmalı)
-  app.use(errorHandler);
-
-  // WebSocket servisini app'e ekle (diğer servislerden erişim için)
-  (app as any).wsService = wsService;
+  const httpServer = http.createServer(app);
+  wsService.initialize(httpServer);
 
   return { app, httpServer, wsService };
 }
-
-

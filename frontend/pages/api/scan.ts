@@ -19,7 +19,7 @@ export default async function handler(
       headers["X-API-Key"] = ADMIN_API_KEY;
     }
 
-    const backendRes = await fetch(`${BACKEND_URL}/scan`, {
+    const backendRes = await fetch(`${BACKEND_URL}/api/scan`, {
       method: "POST",
       headers,
     });

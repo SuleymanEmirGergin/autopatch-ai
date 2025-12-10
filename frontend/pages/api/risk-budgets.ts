@@ -27,7 +27,7 @@ export default async function handler(
     const queryString = params.toString();
 
     const backendRes = await fetch(
-      `${BACKEND_URL}/risk-budgets${queryString ? `?${queryString}` : ""}`,
+      `${BACKEND_URL}/api/risk-budgets${queryString ? `?${queryString}` : ""}`,
       {
         method: req.method,
         headers: getHeaders(),

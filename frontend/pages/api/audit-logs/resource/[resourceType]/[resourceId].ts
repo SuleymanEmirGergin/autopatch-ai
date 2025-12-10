@@ -38,7 +38,7 @@ export default async function handler(
   try {
     const query = req.url?.split("?")[1] || "";
     const backendRes = await fetch(
-      `${BACKEND_URL}/audit-logs/resource/${encodeURIComponent(
+      `${BACKEND_URL}/api/audit-logs/resource/${encodeURIComponent(
         resourceType
       )}/${encodeURIComponent(resourceId)}${query ? `?${query}` : ""}`,
       {

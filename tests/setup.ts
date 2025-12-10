@@ -30,6 +30,9 @@ jest.mock("@tensorflow/tfjs-node", () => {
       dropout: jest.fn().mockReturnValue({}),
       lstm: jest.fn().mockReturnValue({}),
     },
+    regularizers: {
+      l2: jest.fn().mockReturnValue({ l2: 0.01 }),
+    },
   };
 });
 

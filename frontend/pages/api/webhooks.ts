@@ -19,7 +19,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const backendRes = await fetch(`${BACKEND_URL}/webhooks`, {
+    const backendRes = await fetch(`${BACKEND_URL}/api/webhooks`, {
       method: req.method,
       headers: getHeaders(),
       body: req.method === "POST" ? JSON.stringify(req.body) : undefined,

@@ -6,6 +6,9 @@
 
 import { AIController } from "../../src/api/controllers/aiController";
 import { Request, Response } from "express";
+import { ImageRiskModel } from "../../src/persistence/imageRisk.model";
+
+jest.mock("../../src/persistence/imageRisk.model");
 
 describe("AI Security Tests", () => {
   let controller: AIController;
@@ -23,28 +26,34 @@ describe("AI Security Tests", () => {
       json: jest.fn(),
       status: jest.fn().mockReturnThis(),
     };
+    jest.clearAllMocks();
   });
 
   it("should sanitize image name input", async () => {
     mockRequest.params = { imageName: "../../etc/passwd" };
     mockRequest.query = {};
 
+    // Mock ImageRiskModel.findOne to return null (image not found)
+    (ImageRiskModel.findOne as jest.Mock).mockReturnValue({
+      exec: jest.fn().mockResolvedValue(null),
+    });
+
     // Should handle malicious input gracefully
-    const result = await controller.predictRisk(
+    await controller.predictRisk(
       mockRequest as Request,
       mockResponse as Response,
       jest.fn()
     );
 
-    // Should not expose file system
-    expect(mockResponse.status).toHaveBeenCalled();
+    // Should not expose file system - should return 404
+    expect(mockResponse.status).toHaveBeenCalledWith(404);
   });
 
   it("should validate clusterId input", async () => {
     mockRequest.query = { clusterId: "<script>alert('xss')</script>" };
 
     // Should sanitize input
-    const result = await controller.getModelStatus(
+    await controller.getModelStatus(
       mockRequest as Request,
       mockResponse as Response,
       jest.fn()
@@ -56,15 +65,20 @@ describe("AI Security Tests", () => {
   it("should handle SQL injection attempts", async () => {
     mockRequest.params = { imageName: "'; DROP TABLE images; --" };
 
+    // Mock ImageRiskModel.findOne to return null (image not found)
+    (ImageRiskModel.findOne as jest.Mock).mockReturnValue({
+      exec: jest.fn().mockResolvedValue(null),
+    });
+
     // Should handle SQL injection attempts
-    const result = await controller.predictRisk(
+    await controller.predictRisk(
       mockRequest as Request,
       mockResponse as Response,
       jest.fn()
     );
 
-    // Should not execute SQL
-    expect(mockResponse.status).toHaveBeenCalled();
+    // Should not execute SQL - should return 404
+    expect(mockResponse.status).toHaveBeenCalledWith(404);
   });
 });
 

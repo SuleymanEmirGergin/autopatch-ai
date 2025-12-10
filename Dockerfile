@@ -2,7 +2,8 @@
 ### Huawei Cloud / CCE / SWR uyumlu, production için optimize multi-stage build
 
 # 1) BUILD STAGE — tüm dev dependency'ler burada
-FROM node:18-alpine AS builder
+# TensorFlow.js için tam Debian image kullanıyoruz (slim yeterli değil)
+FROM node:18 AS builder
 
 WORKDIR /usr/src/app
 
@@ -22,7 +23,8 @@ RUN npm run build
 
 
 # 2) RUNTIME STAGE — sadece production dependency'ler
-FROM node:18-alpine AS runner
+# TensorFlow.js için tam Debian image kullanıyoruz
+FROM node:18 AS runner
 
 WORKDIR /usr/src/app
 

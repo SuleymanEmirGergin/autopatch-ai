@@ -25,7 +25,7 @@ export default async function handler(
   try {
     const query = req.url?.split("?")[1] || "";
     const backendRes = await fetch(
-      `${BACKEND_URL}/audit-logs${query ? `?${query}` : ""}`,
+      `${BACKEND_URL}/api/audit-logs${query ? `?${query}` : ""}`,
       {
         headers: getHeaders(),
       }

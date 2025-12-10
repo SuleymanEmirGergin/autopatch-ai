@@ -23,7 +23,7 @@ export default async function handler(
   }
 
   try {
-    const backendRes = await fetch(`${BACKEND_URL}/tickets/jira`, {
+    const backendRes = await fetch(`${BACKEND_URL}/api/tickets/jira`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify(req.body),
