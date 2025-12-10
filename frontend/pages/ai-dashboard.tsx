@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { GetServerSideProps } from "next";
-import { useState } from "react";
+import { useRouter } from "next/router";
 import MainLayout from "../components/MainLayout";
 
 interface AIModel {
@@ -24,6 +24,42 @@ export interface Props {
 }
 
 export default function AIDashboardPage({ models, stats, error }: Props) {
+  const router = useRouter();
+
+  const handleFeatureClick = (featureName: string) => {
+    switch (featureName) {
+      case "Risk Prediction":
+        // Image seçimi için modal veya direkt images sayfasına yönlendir
+        router.push("/images-risk");
+        break;
+      case "Anomaly Detection":
+        router.push("/anomalies");
+        break;
+      case "Intelligent Recommendations":
+        router.push("/recommendations");
+        break;
+      case "CVE Analysis":
+        // Image detail sayfasına yönlendir veya modal aç
+        router.push("/images-risk");
+        break;
+      case "Similarity Clustering":
+        router.push("/image-comparison");
+        break;
+      case "Health Scoring":
+        router.push("/scorecard");
+        break;
+      case "Risk Forecasting":
+        // Image detail sayfasına yönlendir
+        router.push("/images-risk");
+        break;
+      case "Security Posture":
+        router.push("/scorecard");
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <MainLayout>
       <Head>
@@ -147,6 +183,7 @@ export default function AIDashboardPage({ models, stats, error }: Props) {
             ].map((feature, idx) => (
               <div
                 key={idx}
+                onClick={() => handleFeatureClick(feature.name)}
                 style={{
                   backgroundColor: "#1E293B",
                   borderRadius: "12px",
@@ -157,9 +194,11 @@ export default function AIDashboardPage({ models, stats, error }: Props) {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = "#2563EB";
+                  e.currentTarget.style.backgroundColor = "#1E3A5F";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.borderColor = "#334155";
+                  e.currentTarget.style.backgroundColor = "#1E293B";
                 }}
               >
                 <div style={{ fontSize: "24px", marginBottom: "8px" }}>{feature.icon}</div>
